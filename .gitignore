@@ -1,9 +1,9 @@
 generated
 node_modules/
-plan
+
 .env
 .env.local
-*.env
+
 
 dist/
 build/
@@ -12,6 +12,7 @@ logs
 *.log
 
 .vscode/
-scripts
-note
 .vercel
+
+scripts
+plan
