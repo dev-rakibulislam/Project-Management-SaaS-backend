@@ -1,0 +1,4 @@
+enum PlatformRole {
+  USER
+  SUPER_ADMIN
+}
