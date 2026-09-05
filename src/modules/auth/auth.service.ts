@@ -1,10 +1,11 @@
+import bcrypt from "bcryptjs";
 import { env } from "../../config/env";
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
 import { getExistingUserFromDB } from "../../utils/getExistingUserFromDB";
 import { generateToken, jwtCookiePayload } from "../../utils/jwt";
 import { hashPassword } from "../../utils/password";
-import type { UserRegisterPayload } from "./auth.validation";
+import type { UserLoginPayload, UserRegisterPayload } from "./auth.validation";
 
 const registerUserInDb = async (payload: UserRegisterPayload) => {
 	const { email, name, password } = payload;
@@ -41,10 +42,42 @@ const registerUserInDb = async (payload: UserRegisterPayload) => {
 	return { accessToken, refreshToken };
 };
 
+const loginUser = async (payload: UserLoginPayload) => {
+	const { email, password } = payload;
+
+	const existingUserRecord = await getExistingUserFromDB({ email });
+
+	if (!existingUserRecord) {
+		throw new AppError(409, "User not exists with this email");
+	}
+	if (!existingUserRecord.password) {
+		throw new AppError(409, "User not register with this password");
+	}
+
+	const validatePassword = await bcrypt.compare(
+		password,
+		existingUserRecord.password,
+	);
+	if (!validatePassword) {
+		throw new AppError(409, "Password not match");
+	}
+
+	const JwtPayload = await jwtCookiePayload(existingUserRecord);
+
+	const accessToken = await generateToken(JwtPayload, {
+		expiresIn: env.JWT_ACCESS_EXPIRES_IN,
+		secret: env.JWT_ACCESS_SECRET,
+	});
+
+	const refreshToken = await generateToken(JwtPayload, {
+		expiresIn: env.JWT_REFRESH_EXPIRES_IN,
+		secret: env.JWT_REFRESH_SECRET,
+	});
+
+	return { accessToken, refreshToken };
+};
+
 export const authService = {
 	registerUserInDb,
-	// getAuths,
-	// getAuth,
-	// updateAuth,
-	// deleteAuth,
+	loginUser,
 };

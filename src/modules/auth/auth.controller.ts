@@ -17,31 +17,18 @@ const registerUserController = catchAsync(async (req, res) => {
 	});
 });
 
-// const loginUserController = catchAsync(async (req: Request, res: Response) => {
-// 	const { accessToken, refreshToken } = await authService.loginUserInDb(
-// 		req.body,
-// 	);
+const loginUserController = catchAsync(async (req, res) => {
+	const { accessToken, refreshToken } = await authService.loginUser(req.body);
 
-// 	setCookie(res, "accessToken", accessToken, {
-// 		httpOnly: true,
-// 		secure: config.node_env === "PRODUCTION",
-// 	});
-
-// 	setCookie(res, "refreshToken", refreshToken, {
-// 		httpOnly: true,
-// 		secure: config.node_env === "PRODUCTION",
-// 		maxAge: 30,
-// 	});
-
-// 	sendResponse(res, {
-// 		code: 201,
-// 		message: "User login successfully.",
-// 		data: {
-// 			accessToken,
-// 			refreshToken,
-// 		},
-// 	});
-// });
+	sendResponse(res, {
+		code: 200,
+		message: "User login successfully.",
+		data: {
+			accessToken,
+			refreshToken,
+		},
+	});
+});
 
 // const getMyProfileController = catchAsync(
 // 	async (req: Request, res: Response) => {
@@ -57,6 +44,6 @@ const registerUserController = catchAsync(async (req, res) => {
 
 export const authController = {
 	registerUserController,
-	// loginUserController,
+	loginUserController,
 	// getMyProfileController,
 };
