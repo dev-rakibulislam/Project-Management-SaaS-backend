@@ -9,6 +9,11 @@ enum OrganizationStatus {
   INACTIVE
 }
 
+enum MembershipStatus {
+  ACTIVE
+  BLOCK
+}
+
 enum OrganizationRole {
   OWNER
   ORG_ADMIN

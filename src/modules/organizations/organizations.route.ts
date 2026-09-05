@@ -1,26 +1,40 @@
 import { Router } from "express";
 import { organizationsController } from "./organizations.controller";
 import authMiddleware from "../../middleware/authentication";
-import { PlatformRole } from "../../../generated/enums";
+import { OrganizationRole, PlatformRole } from "../../../generated/enums";
 import { validateData } from "../../middleware/validator.middleware";
 import { createOrganizationsSchema } from "./organizations.validation";
+import organizationAccessMiddleware from "../../middleware/organizationAccessMiddleware";
 
 const router = Router();
 
 router.post(
-	"/create",
+	"/",
 	authMiddleware(PlatformRole.USER),
-  validateData(createOrganizationsSchema),
+	validateData(createOrganizationsSchema),
 	organizationsController.createOrganizationController,
 );
 
-
 router.get(
-	"/my-organization",
+	"/",
 	authMiddleware(PlatformRole.USER),
 	organizationsController.getMyOrganizationController,
 );
 
+router.get(
+	"/:id",
+	authMiddleware(PlatformRole.USER),
+	organizationsController.getMySingleOrganizationController,
+);
 
+router.get(
+	"/:id/members",
+	authMiddleware(PlatformRole.USER),
+	organizationAccessMiddleware(
+		OrganizationRole.ORG_ADMIN,
+		OrganizationRole.OWNER,
+	),
+	organizationsController.getSingleOrganizationMemberController,
+);
 
 export const organizationsRouter = router;

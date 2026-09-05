@@ -15,9 +15,7 @@ const createOrganizationController = catchAsync(async (req, res) => {
 });
 
 const getMyOrganizationController = catchAsync(async (req, res) => {
-	const result = await organizationsService.getMyOrganizationService(
-		req.user,
-	);
+	const result = await organizationsService.getMyOrganizationService(req.user);
 	sendResponse(res, {
 		code: 200,
 		message: "Organization retrieved successfully",
@@ -25,7 +23,42 @@ const getMyOrganizationController = catchAsync(async (req, res) => {
 	});
 });
 
+const getMySingleOrganizationController = catchAsync(async (req, res) => {
+	const organization =
+		await organizationsService.getMySingleOrganizationService(
+			req.params.id as string,
+		);
+	sendResponse(res, {
+		code: 200,
+		message: "Organization fetched successfully",
+		data: organization
+			? (() => {
+					const { _count, ...rest } = organization;
+					return { ...rest, memberCount: _count.memberships ?? 0 };
+				})()
+			: null,
+	});
+});
+
+const getSingleOrganizationMemberController = catchAsync(async (req, res) => {
+	const page = Number(req.query.page) || 1;
+	const limit = Number(req.query.limit) || 20;
+	const organization =
+		await organizationsService.getSingleOrganizationMemberService(
+			req.params.id as string,
+			page,
+			limit,
+		);
+	sendResponse(res, {
+		code: 200,
+		message: "Organization fetched successfully",
+		data: organization,
+	});
+});
+
 export const organizationsController = {
 	createOrganizationController,
 	getMyOrganizationController,
+	getMySingleOrganizationController,
+	getSingleOrganizationMemberController,
 };

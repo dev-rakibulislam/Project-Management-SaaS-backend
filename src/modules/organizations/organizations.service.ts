@@ -1,7 +1,8 @@
-import { OrganizationRole } from "../../../generated/enums";
+import { OrganizationRole, OrganizationStatus } from "../../../generated/enums";
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
 import type { AuthenticatedUser } from "../../types/auth";
+import { getPagination, getPaginationMeta } from "../../utils/pagination";
 import type { createOrganizationPayload } from "./organizations.validation";
 
 const createOrganizationService = async (
@@ -87,7 +88,80 @@ const getMyOrganizationService = async (user: AuthenticatedUser) => {
 	return result;
 };
 
+const getMySingleOrganizationService = async (id: string) => {
+	const result = await prisma.organization.findUnique({
+		where: {
+			id,
+		},
+		omit: {
+			deletedAt: true,
+		},
+		include: {
+			_count: {
+				select: {
+					memberships: true,
+				},
+			},
+		},
+	});
+
+	return result;
+};
+
+const getSingleOrganizationMemberService = async (
+	orgId: string,
+	page = 1,
+	limit = 20,
+	search?: string,
+) => {
+	const pagination = getPagination(page, limit);
+
+	const [members, total] = await prisma.$transaction([
+		prisma.membership.findMany({
+			where: {
+				organizationId: orgId,
+				status: OrganizationStatus.ACTIVE,
+			},
+			skip: pagination.skip,
+			take: pagination.limit,
+			select: {
+				id: true,
+				userId: true,
+				organizationId: true,
+				role: true,
+				status: true,
+				createdAt: true,
+				updatedAt: true,
+
+				user: {
+					select: {
+						id: true,
+						name: true,
+						email: true,
+					},
+				},
+			},
+			orderBy: {
+				createdAt: "desc",
+			},
+		}),
+
+		prisma.membership.count({
+			where: {
+				organizationId: orgId,
+			},
+		}),
+	]);
+
+	return {
+		members,
+		metaData: getPaginationMeta(pagination.page, pagination.limit, total),
+	};
+};
+
 export const organizationsService = {
 	createOrganizationService,
 	getMyOrganizationService,
+	getMySingleOrganizationService,
+	getSingleOrganizationMemberService,
 };
