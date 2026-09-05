@@ -14,4 +14,13 @@ router.post(
 	organizationsController.createOrganizationController,
 );
 
+
+router.get(
+	"/my-organization",
+	authMiddleware(PlatformRole.USER),
+	organizationsController.getMyOrganizationController,
+);
+
+
+
 export const organizationsRouter = router;

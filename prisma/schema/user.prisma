@@ -14,5 +14,6 @@ model User {
   organizations Organization[]
   memberships   Membership[]
 
+  @@index([email])
   @@map("users")
 }

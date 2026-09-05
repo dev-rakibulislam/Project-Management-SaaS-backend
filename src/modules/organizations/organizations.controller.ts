@@ -14,6 +14,18 @@ const createOrganizationController = catchAsync(async (req, res) => {
 	});
 });
 
+const getMyOrganizationController = catchAsync(async (req, res) => {
+	const result = await organizationsService.getMyOrganizationService(
+		req.user,
+	);
+	sendResponse(res, {
+		code: 200,
+		message: "Organization retrieved successfully",
+		data: result,
+	});
+});
+
 export const organizationsController = {
 	createOrganizationController,
+	getMyOrganizationController,
 };

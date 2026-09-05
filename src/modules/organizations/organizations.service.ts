@@ -62,7 +62,7 @@ const createOrganizationService = async (
 			data: {
 				organizationId: organization.id,
 				userId: user.id,
-				role: OrganizationRole.ORG_ADMIN,
+				role: OrganizationRole.OWNER,
 			},
 			include: { organization: { omit: { deletedAt: true } } },
 		});
@@ -72,6 +72,22 @@ const createOrganizationService = async (
 	return transaction;
 };
 
+const getMyOrganizationService = async (user: AuthenticatedUser) => {
+	const result = await prisma.organization.findMany({
+		where: {
+			ownerId: user.id,
+		},
+		select: {
+			id: true,
+			name: true,
+			slug: true,
+		},
+	});
+
+	return result;
+};
+
 export const organizationsService = {
 	createOrganizationService,
+	getMyOrganizationService,
 };
