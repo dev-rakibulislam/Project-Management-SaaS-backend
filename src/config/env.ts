@@ -8,6 +8,7 @@ const envSchema = z.object({
 	PORT: z.coerce.number().default(3000),
 	DATABASE_URL: z.string().min(1),
 	JWT_SECRET: z.string().min(8),
+	BCRYPT_SALT_ROUNDS: z.coerce.number(),
 	JWT_EXPIRES_IN: z.string().default("7d"),
 	CLIENT_URL: z.string().default("http://localhost:3000"),
 	API_URL: z.string().default("http://localhost:4000"),

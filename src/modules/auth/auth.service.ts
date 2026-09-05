@@ -1,5 +1,8 @@
-const createAuth = async () => {
+
+const createAuth = async (payload:any) => {
   // TODO
+		const result = await Prisma.
+    const r=result.
 };
 
 const getAuths = async () => {

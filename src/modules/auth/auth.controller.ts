@@ -1,29 +1,72 @@
 import { catchAsync } from "../../utils/catchAsync";
 
-const createAuth = catchAsync(async (req, res) => {
-  // TODO
+const registerUserController = catchAsync(
+	async (req, res) => {
+		const { accessToken, refreshToken } = await authService.registerUserInDb(
+			req.body,
+		);
+		setCookie(res, "accessToken", accessToken, {
+			httpOnly: true,
+			secure: config.node_env === "PRODUCTION",
+		});
+
+		setCookie(res, "refreshToken", refreshToken, {
+			httpOnly: true,
+			secure: config.node_env === "PRODUCTION",
+			maxAge: 30,
+		});
+
+		sendResponse(res, {
+			code: 201,
+			message: "User registered successfully.",
+			data: {
+				accessToken,
+				refreshToken,
+			},
+		});
+	},
+);
+
+const loginUserController = catchAsync(async (req: Request, res: Response) => {
+	const { accessToken, refreshToken } = await authService.loginUserInDb(
+		req.body,
+	);
+
+	setCookie(res, "accessToken", accessToken, {
+		httpOnly: true,
+		secure: config.node_env === "PRODUCTION",
+	});
+
+	setCookie(res, "refreshToken", refreshToken, {
+		httpOnly: true,
+		secure: config.node_env === "PRODUCTION",
+		maxAge: 30,
+	});
+
+	sendResponse(res, {
+		code: 201,
+		message: "User login successfully.",
+		data: {
+			accessToken,
+			refreshToken,
+		},
+	});
 });
 
-const getAuths = catchAsync(async (req, res) => {
-  // TODO
-});
-
-const getAuth = catchAsync(async (req, res) => {
-  // TODO
-});
-
-const updateAuth = catchAsync(async (req, res) => {
-  // TODO
-});
-
-const deleteAuth = catchAsync(async (req, res) => {
-  // TODO
-});
+const getMyProfileController = catchAsync(
+	async (req: Request, res: Response) => {
+		
+		const data = await authService.getProfileFromDb(req.user);
+		sendResponse(res, {
+			code: 201,
+			message: "User login successfully.",
+			data,
+		});
+	},
+);
 
 export const authController = {
-  createAuth,
-  getAuths,
-  getAuth,
-  updateAuth,
-  deleteAuth,
+	registerUserController,
+	loginUserController,
+	getMyProfileController,
 };

@@ -2,3 +2,9 @@ enum PlatformRole {
   USER
   SUPER_ADMIN
 }
+
+enum OrganizationStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
