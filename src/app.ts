@@ -4,6 +4,7 @@ import express, {
 	type Response,
 } from "express";
 import { authRouter } from "./modules/auth/auth.route";
+import globalErrorHandler from "./error/globalErrorHandler";
 export const app: Application = express();
 
 // app.use(
@@ -17,7 +18,7 @@ export const app: Application = express();
 // app.use(express.urlencoded({ extended: true }));
 
 // Middleware to parse JSON bodies
-// app.use(express.json());
+app.use(express.json());
 // app.use(cookieParser());
 
 app.use("/api/v1/auth", authRouter);
@@ -30,5 +31,5 @@ app.get("/", async (req: Request, res: Response) => {
 	});
 });
 
-// app.use(globalErrorHandler);
+app.use(globalErrorHandler);
 // app.use(notFound);

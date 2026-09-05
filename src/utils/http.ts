@@ -1,23 +1,23 @@
 import type { Response } from "express";
+import { env } from "../config/env";
 
-export class AppError extends Error {
-  constructor(
-    public statusCode: number,
-    message: string,
-  ) {
-    super(message);
-    this.name = "AppError";
-  }
+export interface ISendResponseParams {
+	code: number;
+	message: string;
+	data?: any;
+	metaData?: any;
+	errorDetails?: any;
 }
 
-export function ok<T>(res: Response, data: T, message = "OK", status = 200) {
-  return res.status(status).json({ success: true, message, data });
-}
-
-export function created<T>(res: Response, data: T, message = "Created") {
-  return ok(res, data, message, 201);
-}
-
-export function fail(res: Response, status: number, message: string) {
-  return res.status(status).json({ success: false, message, data: null });
-}
+export const sendResponse = (
+	res: Response,
+	{ code, message, data, metaData, errorDetails }: ISendResponseParams,
+) => {
+	return res.status(code).json({
+		success: code >= 200 && code < 300,
+		message,
+		data,
+		metaData,
+		errorDetails: env.NODE_ENV === "development" && errorDetails,
+	});
+};

@@ -1,17 +1,21 @@
 import { Router } from "express";
 
 import { authController } from "./auth.controller";
+import { validateData } from "../../middleware/validator.middleware";
+import { userRegisterSchema } from "./auth.validation";
 
 const router = Router();
 
-router.post("/", authController.createAuth);
+router.post(
+	"/register",
+	validateData(userRegisterSchema),
+	authController.registerUserController,
+);
 
-router.get("/", authController.getAuths);
+// router.get("/", authController.getMyProfileController);
 
-router.get("/:id", authController.getAuth);
+// router.patch("/:id", authController.updateMyProfileController);
 
-router.patch("/:id", authController.updateAuth);
-
-router.delete("/:id", authController.deleteAuth);
+// router.delete("/:id", authController.deleteAuth);
 
 export const authRouter = router;
