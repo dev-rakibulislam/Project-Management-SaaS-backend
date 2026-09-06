@@ -1,6 +1,6 @@
 import type { User } from "../../generated/client";
 import jwt, { type SignOptions } from "jsonwebtoken";
-import { TJwtData, TJwtPayload } from "../types/jwtType";
+import type { TJwtData, TJwtPayload } from "../types/jwtType";
 
 export async function jwtCookiePayload(
 	result: Pick<User, "id" | "email" | "platformRole" | "isActive">,

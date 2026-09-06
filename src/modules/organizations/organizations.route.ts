@@ -37,4 +37,14 @@ router.get(
 	organizationsController.getSingleOrganizationMemberController,
 );
 
+router.patch(
+	"/:id",
+	authMiddleware(PlatformRole.USER),
+	organizationAccessMiddleware(
+		OrganizationRole.ORG_ADMIN,
+		OrganizationRole.OWNER,
+	),
+	organizationsController.updateOrganizationController,
+);
+
 export const organizationsRouter = router;

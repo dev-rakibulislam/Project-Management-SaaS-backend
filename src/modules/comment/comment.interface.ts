@@ -1,3 +1,1 @@
-export interface IComment {
-  // TODO
-}
+export type IComment = {}

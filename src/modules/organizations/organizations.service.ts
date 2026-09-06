@@ -1,4 +1,8 @@
-import { OrganizationRole, OrganizationStatus } from "../../../generated/enums";
+import {
+	MembershipStatus,
+	OrganizationRole,
+	OrganizationStatus,
+} from "../../../generated/enums";
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
 import type { AuthenticatedUser } from "../../types/auth";
@@ -74,18 +78,26 @@ const createOrganizationService = async (
 };
 
 const getMyOrganizationService = async (user: AuthenticatedUser) => {
-	const result = await prisma.organization.findMany({
+	const result = await prisma.membership.findMany({
 		where: {
-			ownerId: user.id,
+			userId: user.id,
+			status: MembershipStatus.ACTIVE,
+			organization: {
+				deletedAt: null,
+			},
 		},
 		select: {
-			id: true,
-			name: true,
-			slug: true,
+			organization: {
+				select: {
+					id: true,
+					name: true,
+					slug: true,
+				},
+			},
 		},
 	});
 
-	return result;
+	return result.map((item) => item.organization);
 };
 
 const getMySingleOrganizationService = async (id: string) => {
@@ -112,7 +124,6 @@ const getSingleOrganizationMemberService = async (
 	orgId: string,
 	page = 1,
 	limit = 20,
-	search?: string,
 ) => {
 	const pagination = getPagination(page, limit);
 
@@ -159,9 +170,17 @@ const getSingleOrganizationMemberService = async (
 	};
 };
 
+const updateOrganizationService = async (orgId: string) => {
+	const result = await prisma.organization.update({
+		where: { id: orgId },
+		data: { name: "", slug: "" },
+	});
+};
+
 export const organizationsService = {
 	createOrganizationService,
 	getMyOrganizationService,
 	getMySingleOrganizationService,
 	getSingleOrganizationMemberService,
+	updateOrganizationService,
 };

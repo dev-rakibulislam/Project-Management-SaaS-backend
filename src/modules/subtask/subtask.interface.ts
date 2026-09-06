@@ -1,3 +1,1 @@
-export interface ISubtask {
-  // TODO
-}
+export type ISubtask = {}

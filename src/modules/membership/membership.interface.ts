@@ -1,3 +1,1 @@
-export interface IMembership {
-  // TODO
-}
+export type IMembership = {}

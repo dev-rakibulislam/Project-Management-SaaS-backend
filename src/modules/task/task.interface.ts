@@ -1,3 +1,1 @@
-export interface ITask {
-  // TODO
-}
+export type ITask = {}

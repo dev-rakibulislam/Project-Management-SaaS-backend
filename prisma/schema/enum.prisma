@@ -19,3 +19,27 @@ enum OrganizationRole {
   ORG_ADMIN
   MEMBER
 }
+
+enum PaymentProvider {
+  // BKASH
+  SSLCOMMERZ
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
+//? later
+// enum SubscriptionPlan {
+//   FREE
+//   BASIC
+//   PRO
+// }
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  CANCELLED
+}

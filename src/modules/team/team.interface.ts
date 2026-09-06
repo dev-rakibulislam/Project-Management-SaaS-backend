@@ -1,3 +1,1 @@
-export interface ITeam {
-  // TODO
-}
+export type ITeam = {}

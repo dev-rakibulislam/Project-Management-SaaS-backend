@@ -1,3 +1,1 @@
-export interface IAttachment {
-  // TODO
-}
+export type IAttachment = {}

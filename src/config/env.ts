@@ -14,13 +14,14 @@ const envSchema = z.object({
 	BCRYPT_SALT_ROUNDS: z.coerce.number(),
 	CLIENT_URL: z.string().default("http://localhost:3000"),
 	API_URL: z.string().default("http://localhost:4000"),
-	SSLCOMMERZ_STORE_ID: z.string().optional().default(""),
-	SSLCOMMERZ_STORE_PASSWD: z.string().optional().default(""),
-	SSLCOMMERZ_IS_SANDBOX: z
-		.string()
-		.optional()
-		.default("true")
-		.transform((v) => v !== "false"),
+	STORE_ID: z.string(),
+	STORE_PASSWD: z.string(),
+	SSL_PRODUCT_AMOUNT: z.coerce.number(),
+	CURRENCY: z.string(),
+	SUCCESS_URL: z.string(),
+	FAIL_URL: z.string(),
+	SANDBOX_API_URL: z.string(),
+	LIVE_API_URL: z.string(),
 });
 
 export const env = envSchema.parse(process.env);

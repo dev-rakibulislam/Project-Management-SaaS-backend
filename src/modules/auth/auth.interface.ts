@@ -1,3 +1,1 @@
-export interface IAuth {
-  // TODO
-}
+export type IAuth = {}

@@ -1,3 +1,1 @@
-export interface IAuditlog {
-  // TODO
-}
+export type IAuditlog = {}

@@ -4,13 +4,14 @@ model Organization {
   slug    String             @unique
   ownerId String
   status  OrganizationStatus @default(ACTIVE)
+  owner   User               @relation(fields: [ownerId], references: [id])
 
-  deletedAt DateTime?
-
-  owner       User         @relation(fields: [ownerId], references: [id])
+  deletedAt   DateTime?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   memberships Membership[]
+
+  subscriptions Subscription?
 
   @@index([slug])
   @@map("organizations")

@@ -1,3 +1,1 @@
-export interface IProject {
-  // TODO
-}
+export type IProject = {}

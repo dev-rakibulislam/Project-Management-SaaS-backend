@@ -56,9 +56,20 @@ const getSingleOrganizationMemberController = catchAsync(async (req, res) => {
 	});
 });
 
+const updateOrganizationController = catchAsync(async (req, res) => {
+	const organization = await organizationsService.updateOrganizationService(
+		req.params.id as string,
+	);
+	sendResponse(res, {
+		code: 200,
+		message: "Organization updated successfully",
+		data: organization,
+	});
+});
 export const organizationsController = {
 	createOrganizationController,
 	getMyOrganizationController,
 	getMySingleOrganizationController,
 	getSingleOrganizationMemberController,
+	updateOrganizationController,
 };
