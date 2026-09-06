@@ -22,4 +22,5 @@ model User {
   creatorTasks Task[] @relation("TaskCreator")
   comments Comment[]
   attachments Attachment[]
+  activityLogs ActivityLog[]
 }

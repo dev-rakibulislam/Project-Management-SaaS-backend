@@ -1,0 +1,23 @@
+model ActivityLog {
+  id String @id @default(uuid())
+
+  action ActivityAction
+
+  entityType String
+  entityId   String
+
+  organizationId String
+  userId         String
+
+  metadata Json?
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([organizationId])
+  @@index([entityType, entityId])
+  @@index([userId])
+}

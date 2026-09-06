@@ -11,6 +11,7 @@ const createAttachmentController = catchAsync(
 		const userId = req.user!.id;
 		const taskId = routeParam(req, "taskId");
 		const file = req.file;
+		const filename = req.file?.originalname;
 		if (!file) {
 			throw new AppError(400, "File is required.");
 		}
@@ -20,6 +21,7 @@ const createAttachmentController = catchAsync(
 			taskId,
 			userId,
 			file.buffer,
+			filename as string,
 		);
 
 		return sendResponse(res, {

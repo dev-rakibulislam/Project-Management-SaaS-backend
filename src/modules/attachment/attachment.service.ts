@@ -1,4 +1,4 @@
-import { UploadApiResponse } from "cloudinary";
+import type { UploadApiResponse } from "cloudinary";
 import AppError from "../../error/appError";
 import cloudinary from "../../lib/cloudinary";
 import { prisma } from "../../lib/prisma";
@@ -8,6 +8,7 @@ const createAttachmentService = async (
 	taskId: string,
 	userId: string,
 	file: Buffer,
+	filename: string,
 ) => {
 	const task = await prisma.task.findFirst({
 		where: {
@@ -51,7 +52,7 @@ const createAttachmentService = async (
 		data: {
 			taskId,
 			fileUrl: cloudinaryResult.secure_url,
-			fileName: cloudinaryResult.original_filename,
+			fileName: filename,
 			publicId: cloudinaryResult.public_id,
 			fileType: cloudinaryResult.resource_type,
 			fileSize: cloudinaryResult.bytes,
@@ -62,26 +63,11 @@ const createAttachmentService = async (
 	return attachment;
 };
 
-const getAttachments = async () => {
-	// TODO
-};
-
-const getAttachment = async () => {
-	// TODO
-};
-
-const updateAttachment = async () => {
-	// TODO
-};
-
 const deleteAttachment = async () => {
 	// TODO
 };
 
 export const attachmentService = {
 	createAttachmentService,
-	getAttachments,
-	getAttachment,
-	updateAttachment,
 	deleteAttachment,
 };
