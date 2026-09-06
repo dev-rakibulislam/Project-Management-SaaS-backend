@@ -6,7 +6,10 @@ import {
 import { env } from "../../config/env";
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
-import { paymentWithSslcommerz } from "../../lib/sslComarcePayment";
+import {
+	paymentVerifySslcommerz,
+	paymentWithSslcommerz,
+} from "../../lib/sslComarcePayment";
 import type { AuthenticatedUser } from "../../types/auth";
 import type { CreatePaymentPayload } from "./payment.validation";
 
@@ -110,74 +113,74 @@ const createPaymentService = async (
 	};
 };
 
-// const verifyPaymentService = async (tran_id: string, val_id: string) => {
-// 	if (!tran_id || !val_id) {
-// 		throw new AppError(400, "Invalid payment data");
-// 	}
-// 	const payment = await prisma.payment.findUnique({
-// 		where: {
-// 			transactionId: tran_id,
-// 		},
-// 	});
+const verifyPaymentService = async (tran_id: string, val_id: string) => {
+	if (!tran_id || !val_id) {
+		throw new AppError(400, "Invalid payment data");
+	}
+	const payment = await prisma.payment.findUnique({
+		where: {
+			transactionId: tran_id,
+		},
+		include: { subscription: true },
+	});
 
-// 	if (!payment) {
-// 		throw new AppError(404, "Payment not found");
-// 	}
-// 	const data = await paymentVerifySslcommerz(val_id);
+	if (!payment) {
+		throw new AppError(404, "Payment not found");
+	}
+	const data = await paymentVerifySslcommerz(val_id);
 
-// 	if (data.status !== "VALID") {
-// 		throw new AppError(400, "Invalid payment");
-// 	} else if (data.tran_id !== payment.transactionId) {
-// 		throw new AppError(400, "Transaction mismatch");
-// 	} else if (Number(data.amount) !== Number(payment.amount)) {
-// 		throw new AppError(400, "Payment amount mismatch");
-// 	}
+	if (data.status !== "VALID") {
+		throw new AppError(400, "Invalid payment");
+	}
+	if (data.tran_id !== payment.transactionId) {
+		throw new AppError(400, "Transaction mismatch");
+	}
+	if (Number(data.amount) !== Number(payment.amount)) {
+		throw new AppError(400, "Payment amount mismatch");
+	}
 
-// 	const {
-// 		risk_level,
-// 		card_brand,
-// 		card_issuer,
-// 		card_type,
-// 		card_category,
-// 		currency_type,
-// 		bank_tran_id,
-// 		val_id: validationId,
-// 	} = data;
+	const {
+		risk_level,
+		card_brand,
+		card_issuer,
+		card_type,
+		card_category,
+		currency_type,
+	} = data;
 
-// 	const transaction = await prisma.$transaction(async (tx) => {
-// 		await tx.payment.update({
-// 			where: {
-// 				id: payment.id,
-// 			},
-// 			data: {
-// 				status: PaymentStatus.PAID,
-// 				paidAt: new Date(),
-// 				currency: currency_type,
-// 				bankTranId: bank_tran_id,
-// 				validationId,
-// 				cardBrand: card_brand,
-// 				cardType: card_type,
-// 				riskLevel: risk_level,
-// 				cardCategory: card_category,
-// 				cardIssuer: card_issuer,
-// 			},
-// 		});
+	const transaction = await prisma.$transaction(async (tx) => {
+		await tx.payment.update({
+			where: {
+				id: payment.id,
+			},
+			data: {
+				status: PaymentStatus.SUCCESS,
+				paidAt: new Date(),
+				currency: currency_type,
+				cardBrand: card_brand,
+				cardType: card_type,
+				riskLevel: risk_level,
+				cardCategory: card_category,
+				cardIssuer: card_issuer,
+				
+			},
+		});
 
-// 		await tx.booking.update({
-// 			where: {
-// 				id: payment.bookingId,
-// 			},
-// 			data: {
-// 				status: BookingStatus.IN_PROGRESS,
-// 			},
-// 		});
-// 		return {
-// 			paymentStatus: PaymentStatus.PAID,
-// 			bookingStatus: BookingStatus.IN_PROGRESS,
-// 		};
-// 	});
-// 	return transaction;
-// };
+		await tx.subscription.update({
+			where: {
+				id: payment.subscriptionId,
+			},
+			data: {
+				status: SubscriptionStatus.ACTIVE,
+			},
+		});
+		return {
+			paymentStatus: PaymentStatus.SUCCESS,
+			SubscriptionStatus: SubscriptionStatus.ACTIVE,
+		};
+	});
+	return transaction;
+};
 
 // const failPaymentService = async (payload: any) => {
 // 	const { tran_id } = payload;
@@ -268,7 +271,7 @@ const createPaymentService = async (
 export const paymentService = {
 	createPaymentService,
 	// failPaymentService,
-	// verifyPaymentService,
+	verifyPaymentService,
 	// getSinglePaymentService,
 	// getMyPaymentService,
 };

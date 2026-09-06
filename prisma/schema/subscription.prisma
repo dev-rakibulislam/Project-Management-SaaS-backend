@@ -14,4 +14,6 @@ model Subscription {
   updatedAt DateTime @updatedAt
 
   payments Payment?
+
+  @@index([id])
 }

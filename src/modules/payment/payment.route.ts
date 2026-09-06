@@ -15,7 +15,7 @@ router.post(
 	paymentController.createPaymentController,
 );
 
-// router.post("/success", paymentController.verifyPaymentController);
+router.post("/success", paymentController.verifyPaymentController);
 // router.post("/fail", paymentController.failPaymentController);
 
 // router.get(

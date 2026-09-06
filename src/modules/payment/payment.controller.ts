@@ -17,34 +17,32 @@ const createPaymentController = catchAsync(
 		});
 	},
 );
+const verifyPaymentController = catchAsync(
+	async (req: Request, res: Response) => {
+		const { tran_id, val_id } = req.body;
+		const result = await paymentService.verifyPaymentService(tran_id, val_id);
 
-// const verifyPaymentController = catchAsync(
-// 	async (req: Request, res: Response) => {
-// 		const { tran_id, val_id } = req.body;
+		sendResponse(res, {
+			code: 200,
+			message: "Payment verified successfully",
+			data: result,
+		});
+	},
+);
 
-// 		const result = await paymentService.verifyPaymentService(tran_id, val_id);
+const failPaymentController = catchAsync(
+	async (req: Request, res: Response) => {
+		const data = req.body;
+		const { message, paymentStatus, transactionId } =
+			await paymentService.failPaymentService(data);
 
-// 		sendResponse(res, {
-// 			code: 201,
-// 			message: "result",
-// 			data: result,
-// 		});
-// 	},
-// );
-
-// const failPaymentController = catchAsync(
-// 	async (req: Request, res: Response) => {
-// 		const data = req.body;
-// 		const { message, paymentStatus, transactionId } =
-// 			await paymentService.failPaymentService(data);
-
-// 		sendResponse(res, {
-// 			code: 201,
-// 			message: message,
-// 			data: { paymentStatus, transactionId },
-// 		});
-// 	},
-// );
+		sendResponse(res, {
+			code: 200,
+			message: message || "Payment processing failed",
+			data: { paymentStatus, transactionId },
+		});
+	},
+);
 
 // const getSinglePaymentController = catchAsync(
 // 	async (req: Request, res: Response) => {
@@ -74,8 +72,8 @@ const createPaymentController = catchAsync(
 
 export const paymentController = {
 	createPaymentController,
-	// failPaymentController,
-	// verifyPaymentController,
+	failPaymentController,
+	verifyPaymentController,
 	// getSinglePaymentController,
 	// getMyPaymentPaymentController,
 };
