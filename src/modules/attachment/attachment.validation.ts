@@ -1,9 +1,13 @@
-import { z } from "zod";
+// import { z } from "zod";
 
-export const createAttachmentSchema = z.object({
-  // TODO
-});
+// export const createAttachmentValidation = z.object({
+//   fileName: z
+//     .string()
+//     .min(1, "File name is required")
+//     .max(255),
 
-export const updateAttachmentSchema = z.object({
-  // TODO
-});
+// });
+
+// export type CreateAttachmentInput = z.infer<
+//   typeof createAttachmentValidation
+// >;

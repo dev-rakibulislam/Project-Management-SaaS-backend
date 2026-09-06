@@ -13,6 +13,8 @@ import { teamMembershipRouter } from "./modules/teammembership/teammembership.ro
 import { projectRouter } from "./modules/project/project.route";
 import { sprintRouter } from "./modules/sprint/sprint.route";
 import { taskRouter } from "./modules/task/task.route";
+import { commentRouter } from "./modules/comment/comment.route";
+import { attachmentRouter } from "./modules/attachment/attachment.route";
 export const app: Application = express();
 
 // app.use(
@@ -38,6 +40,8 @@ app.use("/api/v1/team-membership", teamMembershipRouter);
 app.use("/api/v1/project", projectRouter);
 app.use("/api/v1/sprint", sprintRouter);
 app.use("/api/v1/task", taskRouter);
+app.use("/api/v1/comment", commentRouter);
+app.use("/api/v1/attachment", attachmentRouter);
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {

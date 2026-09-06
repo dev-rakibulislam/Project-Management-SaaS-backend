@@ -1,0 +1,20 @@
+model Attachment {
+  id String @id @default(uuid())
+
+  fileName String
+  fileUrl  String
+  publicId String?
+  fileType String?
+  fileSize Int?
+
+  taskId       String
+  uploadedById String
+
+  task Task @relation(fields: [taskId], references: [id])
+
+  uploadedBy User @relation(fields: [uploadedById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+}

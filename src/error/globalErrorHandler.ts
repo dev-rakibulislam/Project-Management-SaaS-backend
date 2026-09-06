@@ -65,6 +65,12 @@ const globalErrorHandler = (
 			],
 		});
 	}
+
+	sendResponse(res, {
+		code: 500,
+		errorDetails: error,
+		message: "Something went wrong",
+	});
 };
 
 export default globalErrorHandler;

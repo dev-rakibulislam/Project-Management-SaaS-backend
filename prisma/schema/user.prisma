@@ -20,4 +20,6 @@ model User {
   sprints Sprint[]
   tasks Task[] @relation("TaskAssignee")
   creatorTasks Task[] @relation("TaskCreator")
+  comments Comment[]
+  attachments Attachment[]
 }
