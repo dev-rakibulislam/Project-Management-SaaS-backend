@@ -12,7 +12,7 @@ export const handlePrismaError = (error: any) => {
 				errors: [
 					{
 						path: field || "unknown",
-						message: `${field} already exists`,
+						error:error.meta.driverAdapterError.cause,
 					},
 				],
 			};

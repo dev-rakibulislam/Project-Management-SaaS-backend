@@ -1,7 +1,7 @@
 model Team {
   id String @id @default(uuid())
 
-  name        String  @unique
+  name        String
   description String?
 
   organizationId String
@@ -13,4 +13,6 @@ model Team {
   deletedAt DateTime?
 
   teamMemberships TeamMembership[]
+
+  @@unique([name, organizationId])
 }

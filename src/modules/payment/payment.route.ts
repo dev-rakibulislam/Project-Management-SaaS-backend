@@ -7,7 +7,6 @@ import { validateData } from "../../middleware/validator.middleware";
 import authMiddleware from "../../middleware/authentication";
 import {
 	createPaymentSchema,
-	getSinglePaymentSchema,
 } from "./payment.validation";
 const router = Router();
 

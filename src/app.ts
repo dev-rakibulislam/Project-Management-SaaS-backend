@@ -9,6 +9,7 @@ import { organizationsRouter } from "./modules/organizations/organizations.route
 import { paymentRouter } from "./modules/payment/payment.route";
 import { membershipRouter } from "./modules/membership/membership.route";
 import { teamRouter } from "./modules/team/team.route";
+import { teamMembershipRouter } from "./modules/teammembership/teammembership.route";
 export const app: Application = express();
 
 // app.use(
@@ -30,6 +31,7 @@ app.use("/api/v1/organization", organizationsRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/membership", membershipRouter);
 app.use("/api/v1/team", teamRouter);
+app.use("/api/v1/team-membership", teamMembershipRouter);
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {

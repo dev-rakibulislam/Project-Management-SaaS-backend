@@ -6,7 +6,8 @@ const createTeamController = catchAsync(async (req, res) => {
 	if (!req.organizationMembership) {
 		return;
 	}
-	const organizationId = req.organizationMembership.id;
+	const organizationId = req.organizationMembership.organizationId;
+  console.log(organizationId)
 	const result = await teamService.createTeamService(organizationId, req.body);
 	return sendResponse(res, {
 		code: 201,

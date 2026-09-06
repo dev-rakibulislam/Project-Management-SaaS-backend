@@ -37,7 +37,7 @@ const createPaymentService = async (
 		throw new AppError(403, "You are not the owner of this organization");
 	}
 
-	let subscription = organization.subscriptions[0];
+	let subscription = organization.subscriptions;
 
 	if (!subscription) {
 		subscription = await prisma.subscription.create({

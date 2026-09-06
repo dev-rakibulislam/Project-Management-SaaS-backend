@@ -1,29 +1,32 @@
+import type { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
+import { sendResponse } from "../../utils/http";
+import { routeParam } from "../../utils/routeParam";
+import { teammembershipService } from "./teammembership.service";
 
-const createTeammembership = catchAsync(async (req, res) => {
-  // TODO
-});
+const addTeamMemberController = catchAsync(
+	async (req: Request, res: Response) => {
+		const organizationId = req.organizationMembership!.organizationId;
+		const teamId = routeParam(req, "teamId");
 
-const getTeammemberships = catchAsync(async (req, res) => {
-  // TODO
-});
+		const result = await teammembershipService.addTeamMemberService(
+			teamId,
+			organizationId,
+			req.body
+		);
 
-const getTeammembership = catchAsync(async (req, res) => {
-  // TODO
-});
+		return sendResponse(res, {
+			code: 201,
+			message: "Member added to team successfully.",
+			data: result,
+		});
+	},
+);
 
-const updateTeammembership = catchAsync(async (req, res) => {
-  // TODO
-});
-
-const deleteTeammembership = catchAsync(async (req, res) => {
-  // TODO
-});
-
-export const teammembershipController = {
-  createTeammembership,
-  getTeammemberships,
-  getTeammembership,
-  updateTeammembership,
-  deleteTeammembership,
+export const teamMembershipController = {
+	addTeamMemberController,
+	// getTeammemberships,
+	// getTeammembership,
+	// updateTeammembership,
+	// deleteTeammembership,
 };
