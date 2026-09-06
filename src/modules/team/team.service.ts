@@ -1,27 +1,21 @@
-const createTeam = async () => {
-  // TODO
-};
+import { prisma } from "../../lib/prisma";
+import type { createTeamPayload } from "./team.validation";
 
-const getTeams = async () => {
-  // TODO
-};
+const createTeamService = async (
+	organizationId: string,
+	data: createTeamPayload,
+) => {
+	const team = await prisma.team.create({
+		data: {
+			name: data.name,
+			description: data.description,
+			organizationId,
+		},
+	});
 
-const getTeam = async () => {
-  // TODO
-};
-
-const updateTeam = async () => {
-  // TODO
-};
-
-const deleteTeam = async () => {
-  // TODO
+	return team;
 };
 
 export const teamService = {
-  createTeam,
-  getTeams,
-  getTeam,
-  updateTeam,
-  deleteTeam,
+	createTeamService,
 };

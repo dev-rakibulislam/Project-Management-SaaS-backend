@@ -12,6 +12,7 @@ model Organization {
   memberships Membership[]
 
   subscriptions Subscription?
+  teams         Team[]
 
   @@index([slug])
   @@map("organizations")

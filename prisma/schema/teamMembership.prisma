@@ -1,0 +1,14 @@
+model TeamMembership {
+  id String @id @default(uuid())
+
+  teamId       String
+  membershipId String
+
+  team Team @relation(fields: [teamId], references: [id])
+
+  membership Membership @relation(fields: [membershipId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([teamId, membershipId])
+}
