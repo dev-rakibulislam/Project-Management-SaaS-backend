@@ -16,20 +16,20 @@ import { taskRouter } from "./modules/task/task.route";
 import { commentRouter } from "./modules/comment/comment.route";
 import { attachmentRouter } from "./modules/attachment/attachment.route";
 export const app: Application = express();
+import cors from "cors";
+import { apiLimiter } from "./middleware/limiter";
+import AppError from "./error/appError";
 
-// app.use(
-// 	cors({
-// 		origin: config.frontend_url,
-// 		credentials: true,
-// 	}),
-// );
+app.use(cors());
+// app.use(cors({ credentials: true }));
 
 // Enable URL-encoded form data parsing
 app.use(express.urlencoded({ extended: true }));
 
 // Middleware to parse JSON bodies
 app.use(express.json());
-// app.use(cookieParser());
+
+app.use(apiLimiter);
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/organization", organizationsRouter);
@@ -51,5 +51,13 @@ app.get("/", async (req: Request, res: Response) => {
 	});
 });
 
+
+app.use((req, _, next) => {
+	next(
+		new AppError(
+			404,
+			`Cannot ${req.method} ${req.originalUrl}. maybe this does not exist or you are not authorized to access this route`,
+		),
+	);
+});
 app.use(globalErrorHandler);
-// app.use(notFound);
