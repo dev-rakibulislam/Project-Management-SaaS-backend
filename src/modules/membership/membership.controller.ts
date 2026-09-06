@@ -1,29 +1,23 @@
 import { catchAsync } from "../../utils/catchAsync";
+import { sendResponse } from "../../utils/http";
+import { membershipService } from "./membership.service";
 
-const createMembership = catchAsync(async (req, res) => {
-  // TODO
-});
+const addMemberController = catchAsync(async (req, res) => {
+	const organizationId = req.organizationMembership?.organizationId;
+	
 
-const getMemberships = catchAsync(async (req, res) => {
-  // TODO
-});
+	const result = await membershipService.addMemberService(
+		organizationId as string,
+	req.body
+	);
 
-const getMembership = catchAsync(async (req, res) => {
-  // TODO
-});
-
-const updateMembership = catchAsync(async (req, res) => {
-  // TODO
-});
-
-const deleteMembership = catchAsync(async (req, res) => {
-  // TODO
+	return sendResponse(res, {
+		code: 201,
+		message: "Member added successfully",
+		data: result,
+	});
 });
 
 export const membershipController = {
-  createMembership,
-  getMemberships,
-  getMembership,
-  updateMembership,
-  deleteMembership,
+	addMemberController,
 };

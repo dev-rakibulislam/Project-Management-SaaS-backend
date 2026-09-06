@@ -1,30 +1,46 @@
-import type { NextFunction, Request, Response } from "express";
-
-import { MembershipStatus, type OrganizationRole } from "../../generated/enums";
-
-import { catchAsync } from "../utils/catchAsync";
+import { NextFunction, Request, Response } from "express";
+import { MembershipStatus, OrganizationRole } from "../../generated/enums";
 import AppError from "../error/appError";
 import { prisma } from "../lib/prisma";
+import { catchAsync } from "../utils/catchAsync";
 import { routeParam } from "../utils/routeParam";
 
 const organizationAccessMiddleware = (...requiredRoles: OrganizationRole[]) => {
 	return catchAsync(
 		async (req: Request, _res: Response, next: NextFunction) => {
-			const organizationId = routeParam(req, "id");
+			const slug = routeParam(req, "slug");
 
-			if (!organizationId) {
-				throw new AppError(400, "Organization ID is required.");
+			if (!slug) {
+				throw new AppError(400, "Organization slug is required.");
 			}
 
 			if (!req.user) {
 				throw new AppError(401, "Unauthorized.");
 			}
 
+			// 1. Organization check
+			const organization = await prisma.organization.findUnique({
+				where: {
+					slug,
+				},
+				select: {
+					id: true,
+					name: true,
+					slug: true,
+					deletedAt: true,
+				},
+			});
+
+
+			if (!organization || organization.deletedAt) {
+				throw new AppError(404, "Organization not found.");
+			}
+
 			const membership = await prisma.membership.findUnique({
 				where: {
 					userId_organizationId: {
 						userId: req.user.id,
-						organizationId,
+						organizationId: organization.id,
 					},
 				},
 				select: {
@@ -55,7 +71,7 @@ const organizationAccessMiddleware = (...requiredRoles: OrganizationRole[]) => {
 			) {
 				throw new AppError(
 					403,
-					"Forbidden. You don't have permission to access this resource.",
+					"You don't have permission to access this resource.",
 				);
 			}
 

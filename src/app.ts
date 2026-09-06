@@ -7,6 +7,7 @@ import { authRouter } from "./modules/auth/auth.route";
 import globalErrorHandler from "./error/globalErrorHandler";
 import { organizationsRouter } from "./modules/organizations/organizations.route";
 import { paymentRouter } from "./modules/payment/payment.route";
+import { membershipRouter } from "./modules/membership/membership.route";
 export const app: Application = express();
 
 // app.use(
@@ -26,6 +27,8 @@ app.use(express.json());
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/organization", organizationsRouter);
 app.use("/api/v1/payment", paymentRouter);
+app.use("/api/v1/membership", membershipRouter);
+
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {
