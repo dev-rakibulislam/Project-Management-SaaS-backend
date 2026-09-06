@@ -4,6 +4,7 @@ import type { Request, Response } from "express";
 import { paymentService } from "./payment.service";
 import { sendResponse } from "../../utils/http";
 import { catchAsync } from "../../utils/catchAsync";
+import { PaymentStatus, SubscriptionStatus } from "../../../generated/enums";
 
 const createPaymentController = catchAsync(
 	async (req: Request, res: Response) => {
@@ -33,13 +34,18 @@ const verifyPaymentController = catchAsync(
 const failPaymentController = catchAsync(
 	async (req: Request, res: Response) => {
 		const data = req.body;
-		const { message, paymentStatus, transactionId } =
-			await paymentService.failPaymentService(data);
+	
+		const result = await paymentService.failPaymentService(data);
 
 		sendResponse(res, {
 			code: 200,
-			message: message || "Payment processing failed",
-			data: { paymentStatus, transactionId },
+			message: result.message || "Payment processing failed",
+			data: {
+				PaymentStatus: result.paymentStatus,
+				...( "SubscriptionStatus" in result
+					? { SubscriptionStatus: result.SubscriptionStatus }
+					: {}),
+			},
 		});
 	},
 );

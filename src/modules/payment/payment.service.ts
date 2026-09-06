@@ -7,6 +7,7 @@ import { env } from "../../config/env";
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
 import {
+	paymentStatusByTranId,
 	paymentVerifySslcommerz,
 	paymentWithSslcommerz,
 } from "../../lib/sslComarcePayment";
@@ -162,7 +163,6 @@ const verifyPaymentService = async (tran_id: string, val_id: string) => {
 				riskLevel: risk_level,
 				cardCategory: card_category,
 				cardIssuer: card_issuer,
-				
 			},
 		});
 
@@ -182,74 +182,89 @@ const verifyPaymentService = async (tran_id: string, val_id: string) => {
 	return transaction;
 };
 
-// const failPaymentService = async (payload: any) => {
-// 	const { tran_id } = payload;
+const failPaymentService = async (payload: any) => {
+	const { tran_id } = payload;
 
-// 	if (!tran_id) {
-// 		throw new AppError(400, "Transaction ID is required");
-// 	}
+	if (!tran_id) {
+		throw new AppError(400, "Transaction ID is required");
+	}
 
-// 	const payment = await prisma.payment.findUnique({
-// 		where: {
-// 			transactionId: tran_id,
-// 		},
-// 	});
-// 	if (!payment) {
-// 		throw new AppError(404, "Payment not found");
-// 	}
-// 	if (payment.status === PaymentStatus.PAID) {
-// 		return {
-// 			message: "Payment is already completed",
-// 			paymentStatus: payment.status,
-// 		};
-// 	}
+	const payment = await prisma.payment.findUnique({
+		where: {
+			transactionId: tran_id,
+		},
+	});
+	if (!payment) {
+		throw new AppError(404, "Payment not found");
+	}
 
-// 	const sslResponse = await paymentStatusByTranId(payment.transactionId);
+	if (payment.status === PaymentStatus.SUCCESS) {
+		return {
+			message: "Payment is already completed",
+			paymentStatus: payment.status,
+		};
+	}
 
-// 	if (
-// 		!sslResponse.element ||
-// 		!Array.isArray(sslResponse.element) ||
-// 		sslResponse.element.length === 0
-// 	) {
-// 		throw new AppError(404, "Transaction not found in SSLCommerz");
-// 	}
+	const sslResponse = await paymentStatusByTranId(
+		payment.transactionId as string,
+	);
 
-// 	const transactions = sslResponse.element.filter(
-// 		(item: any) => item.tran_id === payment.transactionId,
-// 	);
+	if (
+		!sslResponse.element ||
+		!Array.isArray(sslResponse.element) ||
+		sslResponse.element.length === 0
+	) {
+		throw new AppError(404, "Transaction not found in SSLCommerz");
+	}
 
-// 	if (transactions.length === 0) {
-// 		throw new AppError(400, "Transaction ID mismatch");
-// 	}
+	const transactions = sslResponse.element.filter(
+		(item: any) => item.tran_id === payment.transactionId,
+	);
 
-// 	const latestTransaction = transactions.at(-1);
+	if (transactions.length === 0) {
+		throw new AppError(400, "Transaction ID mismatch");
+	}
 
-// 	if (latestTransaction.status !== "FAILED") {
-// 		throw new AppError(
-// 			400,
-// 			`Payment is not failed. Current status: ${latestTransaction.status}`,
-// 		);
-// 	}
+	const latestTransaction = transactions.at(-1);
 
-// 	if (Number(latestTransaction.amount) !== Number(payment.amount)) {
-// 		throw new AppError(400, "Payment amount mismatch");
-// 	}
+	if (latestTransaction.status !== "FAILED") {
+		throw new AppError(
+			400,
+			`Payment is not failed. Current status: ${latestTransaction.status}`,
+		);
+	}
 
-// 	const updatedPayment = await prisma.payment.update({
-// 		where: {
-// 			id: payment.id,
-// 		},
-// 		data: {
-// 			status: PaymentStatus.FAILED,
-// 		},
-// 	});
+	if (Number(latestTransaction.amount) !== Number(payment.amount)) {
+		throw new AppError(400, "Payment amount mismatch");
+	}
 
-// 	return {
-// 		message: "Payment marked as failed",
-// 		paymentStatus: updatedPayment.status,
-// 		transactionId: updatedPayment.transactionId,
-// 	};
-// };
+	const transaction = await prisma.$transaction(async (tx) => {
+		const updatedPayment = await tx.payment.update({
+			where: {
+				id: payment.id,
+			},
+			data: {
+				status: PaymentStatus.FAILED,
+			},
+		});
+
+		const updateSubscription = await tx.subscription.update({
+			where: {
+				id: updatedPayment.subscriptionId,
+			},
+			data: {
+				status: SubscriptionStatus.CANCELLED,
+			},
+		});
+
+		return {
+			message: "Payment marked as failed",
+			paymentStatus: updatedPayment.status,
+			SubscriptionStatus: updateSubscription.status,
+		};
+	});
+	return transaction;
+};
 
 // const getSinglePaymentService = async (id: string) => {
 // 	const data = await prisma.payment.findUnique({ where: { id } });
@@ -270,7 +285,7 @@ const verifyPaymentService = async (tran_id: string, val_id: string) => {
 
 export const paymentService = {
 	createPaymentService,
-	// failPaymentService,
+	failPaymentService,
 	verifyPaymentService,
 	// getSinglePaymentService,
 	// getMyPaymentService,
