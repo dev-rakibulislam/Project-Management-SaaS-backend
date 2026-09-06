@@ -1,5 +1,6 @@
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
+import { makeNoise } from "../../utils/makeNoise";
 import type { CreateSprintInputPayload } from "./sprint.validation";
 
 const createSprintService = async (
@@ -31,6 +32,15 @@ const createSprintService = async (
 			endDate: data.endDate,
 			createdById: userId,
 		},
+	});
+
+	await makeNoise({
+		action: "SPRINT_CREATED",
+		entityId: sprint.id,
+		entityType: "SPRINT",
+		userId,
+		organizationId,
+		metadata: { name: sprint.name },
 	});
 
 	return sprint;

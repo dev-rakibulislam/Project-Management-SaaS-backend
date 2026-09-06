@@ -108,3 +108,13 @@ enum ActivityAction {
   MEMBER_REMOVED
   MEMBER_ROLE_CHANGED
 }
+
+enum ActivityEntityType {
+  TASK
+  PROJECT
+  SPRINT
+  COMMENT
+  MEMBER
+  ORGANIZATION
+  PLATFORM_NOISE
+}
