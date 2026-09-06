@@ -11,6 +11,7 @@ import { membershipRouter } from "./modules/membership/membership.route";
 import { teamRouter } from "./modules/team/team.route";
 import { teamMembershipRouter } from "./modules/teammembership/teammembership.route";
 import { projectRouter } from "./modules/project/project.route";
+import { sprintRouter } from "./modules/sprint/sprint.route";
 export const app: Application = express();
 
 // app.use(
@@ -34,6 +35,7 @@ app.use("/api/v1/membership", membershipRouter);
 app.use("/api/v1/team", teamRouter);
 app.use("/api/v1/team-membership", teamMembershipRouter);
 app.use("/api/v1/project", projectRouter);
+app.use("/api/v1/sprint", sprintRouter);
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {
