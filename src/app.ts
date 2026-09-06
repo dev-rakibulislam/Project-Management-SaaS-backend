@@ -12,6 +12,7 @@ import { teamRouter } from "./modules/team/team.route";
 import { teamMembershipRouter } from "./modules/teammembership/teammembership.route";
 import { projectRouter } from "./modules/project/project.route";
 import { sprintRouter } from "./modules/sprint/sprint.route";
+import { taskRouter } from "./modules/task/task.route";
 export const app: Application = express();
 
 // app.use(
@@ -36,6 +37,7 @@ app.use("/api/v1/team", teamRouter);
 app.use("/api/v1/team-membership", teamMembershipRouter);
 app.use("/api/v1/project", projectRouter);
 app.use("/api/v1/sprint", sprintRouter);
+app.use("/api/v1/task", taskRouter);
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {
