@@ -16,4 +16,6 @@ model Organization {
 
   @@index([slug])
   @@map("organizations")
+  projects Project[]
+  tasks Task[]
 }

@@ -16,4 +16,8 @@ model User {
 
   @@index([email])
   @@map("users")
+  projects Project[]
+  sprints Sprint[]
+  tasks Task[] @relation("TaskAssignee")
+  creatorTasks Task[] @relation("TaskCreator")
 }

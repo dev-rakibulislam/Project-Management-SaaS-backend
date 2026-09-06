@@ -31,6 +31,7 @@ enum PaymentStatus {
   FAILED
   CANCELLED
 }
+
 //? later
 // enum SubscriptionPlan {
 //   FREE
@@ -42,4 +43,34 @@ enum SubscriptionStatus {
   PENDING
   ACTIVE
   CANCELLED
+}
+
+enum ProjectStatus {
+  PLANNING
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum SprintStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
 }
