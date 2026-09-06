@@ -4,7 +4,6 @@ import type { Request, Response } from "express";
 import { paymentService } from "./payment.service";
 import { sendResponse } from "../../utils/http";
 import { catchAsync } from "../../utils/catchAsync";
-import { PaymentStatus, SubscriptionStatus } from "../../../generated/enums";
 
 const createPaymentController = catchAsync(
 	async (req: Request, res: Response) => {
@@ -18,6 +17,7 @@ const createPaymentController = catchAsync(
 		});
 	},
 );
+
 const verifyPaymentController = catchAsync(
 	async (req: Request, res: Response) => {
 		const { tran_id, val_id } = req.body;
@@ -34,7 +34,7 @@ const verifyPaymentController = catchAsync(
 const failPaymentController = catchAsync(
 	async (req: Request, res: Response) => {
 		const data = req.body;
-	
+
 		const result = await paymentService.failPaymentService(data);
 
 		sendResponse(res, {
@@ -42,7 +42,7 @@ const failPaymentController = catchAsync(
 			message: result.message || "Payment processing failed",
 			data: {
 				PaymentStatus: result.paymentStatus,
-				...( "SubscriptionStatus" in result
+				...("SubscriptionStatus" in result
 					? { SubscriptionStatus: result.SubscriptionStatus }
 					: {}),
 			},
@@ -50,36 +50,38 @@ const failPaymentController = catchAsync(
 	},
 );
 
-// const getSinglePaymentController = catchAsync(
-// 	async (req: Request, res: Response) => {
-// 		const payment = await paymentService.getSinglePaymentService(
-// 			req.params.id as string,
-// 		);
+const getMyPaymentPaymentController = catchAsync(
+	async (req: Request, res: Response) => {
+		const payment = await paymentService.getMyPaymentService(req.user.id);
 
-// 		sendResponse(res, {
-// 			code: 200,
-// 			message: payment.message,
-// 			data: payment.data,
-// 		});
-// 	},
-// );
+		sendResponse(res, {
+			code: 200,
+			message: payment.message,
+			data: payment.payments,
+		});
+	},
+);
 
-// const getMyPaymentPaymentController = catchAsync(
-// 	async (req: Request, res: Response) => {
-// 		const payment = await paymentService.getMyPaymentService(req.user.id);
+//		req.body,
+const getSinglePaymentController = catchAsync(
+	async (req: Request, res: Response) => {
+		const payment = await paymentService.getSinglePaymentService(
+			req.params.id as string,
+			req.user.id,
+		);
 
-// 		sendResponse(res, {
-// 			code: 200,
-// 			message: payment.message,
-// 			data: payment.data,
-// 		});
-// 	},
-// );
+		sendResponse(res, {
+			code: 200,
+			message: "Payment details retrieved successfully",
+			data: payment,
+		});
+	},
+);
 
 export const paymentController = {
 	createPaymentController,
 	failPaymentController,
 	verifyPaymentController,
-	// getSinglePaymentController,
-	// getMyPaymentPaymentController,
+	getSinglePaymentController,
+	getMyPaymentPaymentController,
 };

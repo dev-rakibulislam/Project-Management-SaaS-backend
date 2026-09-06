@@ -5,7 +5,10 @@ import { paymentController } from "./payment.controller";
 import { PlatformRole } from "../../../generated/enums";
 import { validateData } from "../../middleware/validator.middleware";
 import authMiddleware from "../../middleware/authentication";
-import { createPaymentSchema } from "./payment.validation";
+import {
+	createPaymentSchema,
+	getSinglePaymentSchema,
+} from "./payment.validation";
 const router = Router();
 
 router.post(
@@ -18,16 +21,16 @@ router.post(
 router.post("/success", paymentController.verifyPaymentController);
 router.post("/fail", paymentController.failPaymentController);
 
-// router.get(
-// 	"/",
-// 	authMiddleware(UserRole.CUSTOMER),
-// 	paymentController.getMyPaymentPaymentController,
-// );
+router.get(
+	"/",
+	authMiddleware(PlatformRole.USER),
+	paymentController.getMyPaymentPaymentController,
+);
 
-// router.get(
-// 	"/:id",
-// 	authMiddleware(UserRole.CUSTOMER),
-// 	paymentController.getSinglePaymentController,
-// );
+router.get(
+	"/:id",
+	authMiddleware(PlatformRole.USER),
+	paymentController.getSinglePaymentController,
+);
 
 export const paymentRouter = router;

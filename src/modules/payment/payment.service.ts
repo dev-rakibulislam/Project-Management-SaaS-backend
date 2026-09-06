@@ -90,7 +90,7 @@ const createPaymentService = async (
 		});
 
 		return {
-			message: "Payment is pending. You can complete the payment now",
+			message: `Payment is pending. You can complete the payment by paying ${env.SSL_PRODUCT_AMOUNT} now`,
 			transactionId: payment.transactionId,
 			paymentUrl: sslResponse.data.GatewayPageURL,
 		};
@@ -108,7 +108,7 @@ const createPaymentService = async (
 	});
 
 	return {
-		message: "Payment initialized successfully",
+		message: `Payment initialized successfully. Amount: ${env.SSL_PRODUCT_AMOUNT}`,
 		transactionId: payment.transactionId,
 		paymentUrl: sslResponse.data.GatewayPageURL,
 	};
@@ -266,27 +266,40 @@ const failPaymentService = async (payload: any) => {
 	return transaction;
 };
 
-// const getSinglePaymentService = async (id: string) => {
-// 	const data = await prisma.payment.findUnique({ where: { id } });
-// 	if (!data) {
-// 		return { message: "payment not found", data: null };
-// 	}
-// 	return { message: "payment found successfully", data };
-// };
+const getMyPaymentService = async (userId: string) => {
+	const payments = await prisma.payment.findMany({
+		where: {
+			subscription: {
+				organization: {
+					ownerId: userId,
+				},
+			},
+			status: PaymentStatus.SUCCESS,
+		},
+	});
 
-// const getMyPaymentService = async (id: string) => {
-// 	const data = await prisma.payment.findMany({ where: { id } });
+	return { message: "payment found successfully", payments };
+};
 
-// 	if (!data) {
-// 		return { message: "payment not found", data: null };
-// 	}
-// 	return { message: "payment found successfully", data };
-// };
+const getSinglePaymentService = async (id: string, userId: string) => {
+	const payment = await prisma.payment.findUnique({
+		where: {
+			id,
+			subscription: { organization: { ownerId: userId } },
+		},
+	});
+
+	if (!payment) {
+		throw new AppError(404, "Payment not found");
+	}
+
+	return payment;
+};
 
 export const paymentService = {
 	createPaymentService,
 	failPaymentService,
 	verifyPaymentService,
-	// getSinglePaymentService,
-	// getMyPaymentService,
+	getSinglePaymentService,
+	getMyPaymentService,
 };
