@@ -7,7 +7,10 @@ import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
 import type { AuthenticatedUser } from "../../types/auth";
 import { getPagination, getPaginationMeta } from "../../utils/pagination";
-import type { createOrganizationPayload } from "./organizations.validation";
+import type {
+	createOrganizationPayload,
+	updateOrganizationPayload,
+} from "./organizations.validation";
 
 const createOrganizationService = async (
 	payload: createOrganizationPayload,
@@ -170,11 +173,15 @@ const getSingleOrganizationMemberService = async (
 	};
 };
 
-const updateOrganizationService = async (orgId: string) => {
+const updateOrganizationService = async (
+	orgId: string,
+	data: updateOrganizationPayload,
+) => {
 	const result = await prisma.organization.update({
 		where: { id: orgId },
-		data: { name: "", slug: "" },
+		data,
 	});
+	return result;
 };
 
 export const organizationsService = {

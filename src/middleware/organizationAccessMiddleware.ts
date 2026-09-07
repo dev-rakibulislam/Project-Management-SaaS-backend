@@ -9,9 +9,10 @@ const organizationAccessMiddleware = (...requiredRoles: OrganizationRole[]) => {
 	return catchAsync(
 		async (req: Request, _res: Response, next: NextFunction) => {
 			const slug = routeParam(req, "slug");
+			const orgId = routeParam(req, "orgId");
 
-			if (!slug) {
-				throw new AppError(400, "Organization slug is required.");
+			if (!slug && !orgId) {
+				throw new AppError(400, "Organization Id or slug is required.");
 			}
 
 			if (!req.user) {
@@ -21,7 +22,8 @@ const organizationAccessMiddleware = (...requiredRoles: OrganizationRole[]) => {
 			// 1. Organization check
 			const organization = await prisma.organization.findUnique({
 				where: {
-					slug,
+					...(orgId ? { id: orgId } : { slug }),
+					deletedAt: null,
 				},
 				select: {
 					id: true,
@@ -30,7 +32,6 @@ const organizationAccessMiddleware = (...requiredRoles: OrganizationRole[]) => {
 					deletedAt: true,
 				},
 			});
-
 
 			if (!organization || organization.deletedAt) {
 				throw new AppError(404, "Organization not found.");

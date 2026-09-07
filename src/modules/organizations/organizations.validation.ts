@@ -19,3 +19,7 @@ export const createOrganizationsSchema = z.object({
 export type createOrganizationPayload = z.infer<
 	typeof createOrganizationsSchema
 >;
+
+export type updateOrganizationPayload = z.infer<
+	typeof createOrganizationsSchema
+>;

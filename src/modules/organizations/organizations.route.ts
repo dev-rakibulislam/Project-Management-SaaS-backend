@@ -28,7 +28,7 @@ router.get(
 );
 
 router.get(
-	"/:id/members",
+	"/:orgId/members",
 	authMiddleware(PlatformRole.USER),
 	organizationAccessMiddleware(
 		OrganizationRole.ORG_ADMIN,
@@ -38,8 +38,9 @@ router.get(
 );
 
 router.patch(
-	"/:id",
+	"/:orgId",
 	authMiddleware(PlatformRole.USER),
+	validateData(createOrganizationsSchema),
 	organizationAccessMiddleware(
 		OrganizationRole.ORG_ADMIN,
 		OrganizationRole.OWNER,

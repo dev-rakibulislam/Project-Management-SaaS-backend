@@ -1,5 +1,6 @@
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/http";
+import { routeParam } from "../../utils/routeParam";
 import { organizationsService } from "./organizations.service";
 
 const createOrganizationController = catchAsync(async (req, res) => {
@@ -43,9 +44,10 @@ const getMySingleOrganizationController = catchAsync(async (req, res) => {
 const getSingleOrganizationMemberController = catchAsync(async (req, res) => {
 	const page = Number(req.query.page) || 1;
 	const limit = Number(req.query.limit) || 20;
+	const orgId = routeParam(req, "orgId");
 	const organization =
 		await organizationsService.getSingleOrganizationMemberService(
-			req.params.id as string,
+			orgId,
 			page,
 			limit,
 		);
@@ -57,15 +59,16 @@ const getSingleOrganizationMemberController = catchAsync(async (req, res) => {
 });
 
 const updateOrganizationController = catchAsync(async (req, res) => {
-	const organization = await organizationsService.updateOrganizationService(
-		req.params.id as string,
-	);
+	const orgId = routeParam(req, "orgId");
+	const organization =
+		await organizationsService.updateOrganizationService(orgId,req.body);
 	sendResponse(res, {
 		code: 200,
 		message: "Organization updated successfully",
 		data: organization,
 	});
 });
+
 export const organizationsController = {
 	createOrganizationController,
 	getMyOrganizationController,
