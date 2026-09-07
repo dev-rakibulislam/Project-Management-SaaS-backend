@@ -78,7 +78,7 @@ const createOrganizationService = async (
 		return { result, organization };
 	});
 
-	makeNoise({
+	await makeNoise({
 		entityId: organization.id,
 		action: "ORGANIZATION_CREATED",
 		entityType: "ORGANIZATION",
@@ -192,7 +192,7 @@ const updateOrganizationService = async (
 		data,
 	});
 
-	makeNoise({
+	await makeNoise({
 		entityId: result.id,
 		action: "ORGANIZATION_UPDATED",
 		entityType: "ORGANIZATION",

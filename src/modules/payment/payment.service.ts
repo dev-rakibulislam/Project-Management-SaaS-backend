@@ -108,7 +108,7 @@ const createPaymentService = async (
 		},
 	});
 
-	makeNoise({
+	await makeNoise({
 		entityId: organization.id,
 		action: "PAYMENT_INIT",
 		entityType: "PAYMENT",
@@ -191,7 +191,7 @@ const verifyPaymentService = async (tran_id: string, val_id: string) => {
 		};
 	});
 
-	makeNoise({
+	await makeNoise({
 		entityId: pay.id,
 		action: "PAYMENT_VERIFY",
 		entityType: "PAYMENT",

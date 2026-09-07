@@ -140,10 +140,17 @@ const deleteSprintService = async (
 		throw new AppError(404, "Sprint not found.");
 	}
 
-	 await prisma.sprint.delete({
+	await prisma.sprint.delete({
 		where: {
 			id: sprint.id,
 		},
+	});
+
+	await makeNoise({
+		action: "SPRINT_DELETED",
+		entityId: sprint.id,
+		entityType: "SPRINT",
+		organizationId,
 	});
 
 	return {};

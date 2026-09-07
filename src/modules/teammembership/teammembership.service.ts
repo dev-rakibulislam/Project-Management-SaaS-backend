@@ -1,6 +1,7 @@
 import { MembershipStatus } from "../../../generated/enums";
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
+import { makeNoise } from "../../utils/makeNoise";
 import type { addTeamMemberValidationPayload } from "./teammembership.validation";
 
 const addTeamMemberService = async (
@@ -55,6 +56,13 @@ const addTeamMemberService = async (
 			teamId,
 			membershipId: membershipId.membershipId,
 		},
+	});
+
+	await makeNoise({
+		action: "TEAM_MEMBER_ADD",
+		entityId: teamMember.id,
+		entityType: "TEAM",
+		organizationId,
 	});
 
 	return teamMember;
@@ -166,6 +174,14 @@ const deleteTeamMemberService = async (
 			id: teamMember.id,
 		},
 	});
+
+	await makeNoise({
+		action: "TEAM_MEMBER_DELETE",
+		entityId: teamMember.id,
+		entityType: "TEAM",
+		organizationId,
+	});
+
 	return {};
 };
 

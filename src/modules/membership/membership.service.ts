@@ -46,7 +46,7 @@ const addMemberService = async (
 		},
 	});
 
-	makeNoise({
+	await makeNoise({
 		entityId: membership.id,
 		action: "MEMBER_ADDED",
 		entityType: "MEMBER",
@@ -185,7 +185,7 @@ const updateMembershipRoleService = async (
 		},
 	});
 
-	makeNoise({
+	await makeNoise({
 		entityId: updatedMembership.id,
 		action: "MEMBER_ADDED",
 		entityType: "MEMBER",
@@ -228,7 +228,7 @@ const updateMemberStatusService = async (
 		},
 	});
 
-	makeNoise({
+	await makeNoise({
 		entityId: updatedMembership.id,
 		action: "MEMBER_STATUS_CHANGED",
 		entityType: "MEMBER",
@@ -267,7 +267,7 @@ const deleteMemberService = async (
 		},
 	});
 
-	makeNoise({
+	await makeNoise({
 		entityId: deletedMembership.id,
 		action: "MEMBER_REMOVED",
 		entityType: "MEMBER",

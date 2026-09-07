@@ -40,7 +40,7 @@ const registerUserInDb = async (payload: UserRegisterPayload) => {
 		secret: env.JWT_REFRESH_SECRET,
 	});
 
-	makeNoise({
+	await makeNoise({
 		entityId: JwtPayload.id,
 		action: "USER_REGISTER",
 		entityType: "USER",
@@ -82,7 +82,7 @@ const loginUser = async (payload: UserLoginPayload) => {
 		secret: env.JWT_REFRESH_SECRET,
 	});
 
-	makeNoise({
+	await makeNoise({
 		entityId: JwtPayload.id,
 		action: "USER_LOGIN",
 		entityType: "USER",

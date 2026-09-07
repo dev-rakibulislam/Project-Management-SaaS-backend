@@ -34,7 +34,7 @@ const createCommentService = async (
 		},
 	});
 
-	makeNoise({
+	await makeNoise({
 		entityId: comment.id,
 		action: "COMMENT_CREATED",
 		entityType: "COMMENT",
@@ -75,7 +75,7 @@ const updateCommentService = async (
 		},
 	});
 
-	makeNoise({
+	await makeNoise({
 		entityId: updatedComment.id,
 		action: "COMMENT_UPDATED",
 		entityType: "COMMENT",
@@ -194,7 +194,7 @@ const deleteCommentService = async (
 		},
 	});
 
-	makeNoise({
+	await makeNoise({
 		entityId: comment.id,
 		action: "COMMENT_DELETED",
 		entityType: "COMMENT",

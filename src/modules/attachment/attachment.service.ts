@@ -61,19 +61,17 @@ const createAttachmentService = async (
 		},
 	});
 
-	makeNoise({
+	await makeNoise({
 		entityId: attachment.id,
-		action: "ADD_attachment",
-		entityType: "attachment",
-		organizationId:organizationId,
+		action: "ATTACHMENT_ADD",
+		entityType: "ATTACHMENT",
+		organizationId: organizationId,
 		userId,
 	});
 
 	return attachment;
 };
 
-
 export const attachmentService = {
 	createAttachmentService,
-	
 };
