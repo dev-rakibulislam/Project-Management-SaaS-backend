@@ -1,5 +1,6 @@
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
+import { makeNoise } from "../../utils/makeNoise";
 import { getPagination, getPaginationMeta } from "../../utils/pagination";
 import { QueryParams } from "../../utils/query";
 import type {
@@ -38,6 +39,13 @@ const createProjectService = async (
 			endDate: data.endDate,
 			createdById: userId,
 		},
+	});
+
+	await makeNoise({
+		action: "PROJECT_CREATED",
+		entityId: project.id,
+		entityType: "PROJECT",
+		organizationId,
 	});
 
 	return project;
@@ -83,6 +91,16 @@ const assignProjectTeamService = async (
 		},
 		include: {
 			team: true,
+		},
+	});
+
+	await makeNoise({
+		action: "PROJECT_UPDATED",
+		entityId: project.id,
+		entityType: "PROJECT",
+		organizationId,
+		metadata: {
+			teamId: team.id,
 		},
 	});
 
@@ -271,6 +289,16 @@ const updateProjectService = async (
 		},
 	});
 
+	await makeNoise({
+		action: "PROJECT_UPDATED",
+		entityId: project.id,
+		entityType: "PROJECT",
+		organizationId,
+		metadata: {
+			payload,
+		},
+	});
+
 	return updatedProject;
 };
 
@@ -297,6 +325,13 @@ const deleteProjectService = async (
 		data: {
 			deletedAt: new Date(),
 		},
+	});
+
+	await makeNoise({
+		action: "PROJECT_DELETED",
+		entityId: project.id,
+		entityType: "PROJECT",
+		organizationId,
 	});
 
 	return {};
