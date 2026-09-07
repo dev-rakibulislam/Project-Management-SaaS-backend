@@ -39,6 +39,16 @@ router.get(
   teamMembershipController.getSingleTeamMemberController,
 );
 
+router.delete(
+  "/:slug/teams/:teamId/members/:teamMemberId",
+  authMiddleware(PlatformRole.USER),
+  subscriptionMiddleware,
+  organizationAccessMiddleware(
+    OrganizationRole.ORG_ADMIN,
+    OrganizationRole.OWNER,
+  ),
+  teamMembershipController.deleteTeamMemberController,
+);
 
 
 

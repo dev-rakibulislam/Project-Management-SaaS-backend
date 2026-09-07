@@ -63,10 +63,30 @@ const getSingleTeamMemberController = catchAsync(
 	},
 );
 
+const deleteTeamMemberController = catchAsync(
+	async (req: Request, res: Response) => {
+		const organizationId = req.organizationMembership!.organizationId;
+
+		const teamId = routeParam(req, "teamId");
+		const teamMemberId = routeParam(req, "teamMemberId");
+
+		const result = await teammembershipService.deleteTeamMemberService(
+			teamId,
+			teamMemberId,
+			organizationId,
+		);
+
+		return sendResponse(res, {
+			code: 200,
+			message: "Team member removed successfully.",
+			data: result,
+		});
+	},
+);
+
 export const teamMembershipController = {
 	addTeamMemberController,
 	getAllTeamMembersController,
 	getSingleTeamMemberController,
-	// updateTeammembership,
-	// deleteTeammembership,
+	deleteTeamMemberController,
 };
