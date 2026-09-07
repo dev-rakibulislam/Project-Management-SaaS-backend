@@ -92,7 +92,31 @@ const loginUser = async (payload: UserLoginPayload) => {
 	return { accessToken, refreshToken };
 };
 
+const getMyProfileService = async (userId: string) => {
+	const user = await prisma.user.findUnique({
+		where: {
+			id: userId,
+		},
+		select: {
+			id: true,
+			name: true,
+			email: true,
+			platformRole: true,
+			isActive: true,
+			createdAt: true,
+			updatedAt: true,
+		},
+	});
+
+	if (!user) {
+		throw new AppError(404, "User not found.");
+	}
+
+	return user;
+};
+
 export const authService = {
 	registerUserInDb,
 	loginUser,
+	getMyProfileService,
 };

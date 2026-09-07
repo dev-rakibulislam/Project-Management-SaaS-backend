@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/http";
 import { authService } from "./auth.service";
@@ -30,20 +31,20 @@ const loginUserController = catchAsync(async (req, res) => {
 	});
 });
 
-// const getMyProfileController = catchAsync(
-// 	async (req: Request, res: Response) => {
+const getMyProfile = catchAsync(async (req: Request, res: Response) => {
+	const userId = req.user!.id;
 
-// 		const data = await authService.getProfileFromDb(req.user);
-// 		sendResponse(res, {
-// 			code: 201,
-// 			message: "User login successfully.",
-// 			data,
-// 		});
-// 	},
-// );
+	const result = await authService.getMyProfileService(userId);
+
+	sendResponse(res, {
+		code: 200,
+		message: "Profile retrieved successfully.",
+		data: result,
+	});
+});
 
 export const authController = {
 	registerUserController,
 	loginUserController,
-	// getMyProfileController,
+	getMyProfile,
 };
