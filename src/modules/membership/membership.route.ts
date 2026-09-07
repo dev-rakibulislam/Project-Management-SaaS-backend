@@ -7,7 +7,10 @@ import { OrganizationRole, PlatformRole } from "../../../generated/enums";
 import organizationAccessMiddleware from "../../middleware/organizationAccessMiddleware";
 import authMiddleware from "../../middleware/authentication";
 import { validateData } from "../../middleware/validator.middleware";
-import { createMembershipSchema } from "./membership.validation";
+import {
+	createMembershipSchema,
+	updateMemberShipRoleSchema,
+} from "./membership.validation";
 
 const router = Router();
 
@@ -23,11 +26,39 @@ router.post(
 	membershipController.addMemberController,
 );
 
-router.get("/:slug/members", membershipController.getMemberController);
+router.get(
+	"/:slug/members",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	organizationAccessMiddleware(
+		OrganizationRole.ORG_ADMIN,
+		OrganizationRole.OWNER,
+	),
+	membershipController.getMemberController,
+);
 
-// router.get("/:id", membershipController.getMembership);
+router.get(
+	"/:slug/members/:memberId",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	organizationAccessMiddleware(
+		OrganizationRole.ORG_ADMIN,
+		OrganizationRole.OWNER,
+	),
+	membershipController.getSingleMemberController,
+);
 
-// router.patch("/:id", membershipController.updateMembership);
+router.patch(
+	"/:slug/members/:memberId/role",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	validateData(updateMemberShipRoleSchema),
+	organizationAccessMiddleware(
+		OrganizationRole.ORG_ADMIN,
+		OrganizationRole.OWNER,
+	),
+	membershipController.updateMemberRoleController,
+);
 
 // router.delete("/:id", membershipController.deleteMembership);
 

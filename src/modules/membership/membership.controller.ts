@@ -1,5 +1,6 @@
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/http";
+import { routeParam } from "../../utils/routeParam";
 import { membershipService } from "./membership.service";
 
 const addMemberController = catchAsync(async (req, res) => {
@@ -31,7 +32,40 @@ const getMemberController = catchAsync(async (req, res) => {
 	});
 });
 
+const getSingleMemberController = catchAsync(async (req, res) => {
+	const organizationId = req.organizationMembership?.organizationId;
+	const memberId = routeParam(req, "memberId");
+	const result = await membershipService.getSingleMembershipService(
+		organizationId as string,
+		memberId,
+	);
+
+	return sendResponse(res, {
+		code: 200,
+		message: "Members fetched successfully",
+		data: result,
+	});
+});
+
+const updateMemberRoleController = catchAsync(async (req, res) => {
+	const organizationId = req.organizationMembership?.organizationId;
+	const memberId = routeParam(req, "memberId");
+	const result = await membershipService.updateMembershipRoleService(
+		organizationId as string,
+		memberId,
+		req.body,
+	);
+
+	return sendResponse(res, {
+		code: 200,
+		message: "Members fetched successfully",
+		data: result,
+	});
+});
+
 export const membershipController = {
 	addMemberController,
 	getMemberController,
+	getSingleMemberController,
+	updateMemberRoleController,
 };

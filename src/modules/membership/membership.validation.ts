@@ -9,4 +9,11 @@ export const createMembershipSchema = z.object({
 	role: z.enum([OrganizationRole.MEMBER, OrganizationRole.ORG_ADMIN]),
 });
 
+export const updateMemberShipRoleSchema = z.object({
+	role: z.enum([OrganizationRole.MEMBER, OrganizationRole.ORG_ADMIN]),
+});
+
 export type createMembershipPayload = z.infer<typeof createMembershipSchema>;
+export type updateMemberShipRolePayload = z.infer<
+	typeof updateMemberShipRoleSchema
+>;

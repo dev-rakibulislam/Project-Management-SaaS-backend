@@ -1,7 +1,10 @@
 import { MembershipStatus } from "../../../generated/enums";
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
-import type { createMembershipPayload } from "./membership.validation";
+import type {
+	createMembershipPayload,
+	updateMemberShipRolePayload,
+} from "./membership.validation";
 
 const addMemberService = async (
 	organizationId: string,
@@ -49,12 +52,61 @@ const getAllMembershipService = async (orgId: string) => {
 	return membership;
 };
 
-const getMembership = async () => {
-	// TODO
+const getSingleMembershipService = async (
+	organizationId: string,
+	memberId: string,
+) => {
+	const membership = await prisma.membership.findFirst({
+		where: {
+			id: memberId,
+			organizationId,
+			deleteAt: null,
+		},
+		omit: { deleteAt: true },
+		include: {
+			user: {
+				select: {
+					email: true,
+					name: true,
+				},
+			},
+		},
+	});
+
+	if (!membership) {
+		throw new AppError(404, "Member not found.");
+	}
+
+	return membership;
 };
 
-const updateMembership = async () => {
-	// TODO
+const updateMembershipRoleService = async (
+	organizationId: string,
+	memberId: string,
+	role: updateMemberShipRolePayload,
+) => {
+	const membership = await prisma.membership.findFirst({
+		where: {
+			id: memberId,
+			organizationId,
+			deleteAt: null,
+		},
+	});
+
+	if (!membership) {
+		throw new AppError(404, "Member not found.");
+	}
+
+	const updatedMembership = await prisma.membership.update({
+		where: {
+			id: membership.id,
+		},
+		data: {
+			role: role.role,
+		},
+	});
+
+	return updatedMembership;
 };
 
 const deleteMembership = async () => {
@@ -64,7 +116,7 @@ const deleteMembership = async () => {
 export const membershipService = {
 	addMemberService,
 	getAllMembershipService,
-	getMembership,
-	updateMembership,
+	getSingleMembershipService,
+	updateMembershipRoleService,
 	deleteMembership,
 };
