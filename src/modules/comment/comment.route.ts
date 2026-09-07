@@ -32,6 +32,12 @@ router.patch(
 	commentController.updateCommentController,
 );
 
-
+router.delete(
+	"/:slug/projects/:projectId/tasks/:taskId/comments/:commentId",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	organizationAccessMiddleware(),
+	commentController.deleteCommentController,
+);
 
 export const commentRouter = router;

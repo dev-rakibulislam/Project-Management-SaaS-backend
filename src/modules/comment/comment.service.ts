@@ -68,7 +68,41 @@ const updateCommentService = async (
 	return updatedComment;
 };
 
+const deleteCommentService = async (
+	commentId: string,
+	taskId: string,
+	userId: string,
+) => {
+	const comment = await prisma.comment.findFirst({
+		where: {
+			id: commentId,
+			taskId,
+			userId,
+			deletedAt: null,
+		},
+	});
+
+	if (!comment) {
+		throw new AppError(
+			404,
+			"Comment not found or you don't have permission to delete it.",
+		);
+	}
+
+	const deletedComment = await prisma.comment.update({
+		where: {
+			id: comment.id,
+		},
+		data: {
+			deletedAt: new Date(),
+		},
+	});
+
+	return deletedComment;
+};
+
 export const commentService = {
 	createCommentService,
 	updateCommentService,
+	deleteCommentService,
 };

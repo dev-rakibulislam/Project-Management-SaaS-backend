@@ -46,7 +46,28 @@ const updateCommentController = catchAsync(
 	},
 );
 
+const deleteCommentController = catchAsync(
+	async (req: Request, res: Response) => {
+		const commentId = routeParam(req, "commentId");
+		const taskId = routeParam(req, "taskId");
+		const userId = req.user!.id;
+
+		const result = await commentService.deleteCommentService(
+			commentId,
+			taskId,
+			userId,
+		);
+
+		return sendResponse(res, {
+			code: 200,
+			message: "Comment deleted successfully.",
+			data: result,
+		});
+	},
+);
+
 export const commentController = {
 	createCommentController,
 	updateCommentController,
+	deleteCommentController,
 };
