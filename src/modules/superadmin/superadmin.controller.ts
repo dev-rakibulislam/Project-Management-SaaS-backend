@@ -69,12 +69,14 @@ const restoreUser = catchAsync(async (req: Request, res: Response) => {
 const getAllPayments = catchAsync(async (req: Request, res: Response) => {
 	const query = getQueryParams(req.query as Record<string, unknown>);
 
-	const result = await superAdminService.getAllPaymentsService(query);
+	const { meta, payments } =
+		await superAdminService.getAllPaymentsService(query);
 
 	sendResponse(res, {
 		code: 200,
 		message: "Payments retrieved successfully.",
-		data: result,
+		data: payments,
+		metaData: meta,
 	});
 });
 
