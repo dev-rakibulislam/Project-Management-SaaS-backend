@@ -1,6 +1,7 @@
 import { MembershipStatus, OrganizationRole } from "../../../generated/enums";
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
+import { makeNoise } from "../../utils/makeNoise";
 import { getPagination, getPaginationMeta } from "../../utils/pagination";
 import { QueryParams } from "../../utils/query";
 import type {
@@ -78,6 +79,13 @@ const createTaskService = async (
 		},
 	});
 
+	await makeNoise({
+		action: "TASK_CREATED",
+		entityId: task.id,
+		entityType: "TASK",
+		organizationId,
+	});
+
 	return task;
 };
 
@@ -86,7 +94,6 @@ const getTasksService = async (
 	organizationId: string,
 	query: QueryParams,
 ) => {
-	
 	const { page, limit } = query;
 
 	const {
@@ -230,6 +237,14 @@ const updateTaskService = async (
 		},
 	});
 
+	await makeNoise({
+		action: "TASK_UPDATED",
+		entityId: task.id,
+		entityType: "TASK",
+		organizationId,
+		metadata: payload,
+	});
+
 	return updatedTask;
 };
 
@@ -291,6 +306,14 @@ const changeTaskStatusService = async (
 		},
 	});
 
+	await makeNoise({
+		action: "TASK_UPDATED",
+		entityId: task.id,
+		entityType: "TASK",
+		organizationId,
+		metadata: status,
+	});
+
 	return updatedTask;
 };
 
@@ -338,6 +361,14 @@ const assignTaskService = async (
 		},
 	});
 
+	await makeNoise({
+		action: "TASK_UPDATED",
+		entityId: task.id,
+		entityType: "TASK",
+		organizationId,
+		metadata: assigneeId,
+	});
+
 	return updatedTask;
 };
 
@@ -366,6 +397,13 @@ const changeTaskPriorityService = async (
 		data: {
 			priority: priority.priority,
 		},
+	});
+	await makeNoise({
+		action: "TASK_UPDATED",
+		entityId: task.id,
+		entityType: "TASK",
+		organizationId,
+		metadata: priority,
 	});
 
 	return updatedTask;
@@ -396,6 +434,13 @@ const deleteTaskService = async (
 		data: {
 			deletedAt: new Date(),
 		},
+	});
+
+	await makeNoise({
+		action: "TASK_DELETED",
+		entityId: task.id,
+		entityType: "TASK",
+		organizationId,
 	});
 
 	return {};
