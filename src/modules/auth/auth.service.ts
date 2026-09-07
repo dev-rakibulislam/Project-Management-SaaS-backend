@@ -6,6 +6,7 @@ import { getExistingUserFromDB } from "../../utils/getExistingUserFromDB";
 import { generateToken, jwtCookiePayload } from "../../utils/jwt";
 import { hashPassword } from "../../utils/password";
 import type { UserLoginPayload, UserRegisterPayload } from "./auth.validation";
+import { makeNoise } from "../../utils/makeNoise";
 
 const registerUserInDb = async (payload: UserRegisterPayload) => {
 	const { email, name, password } = payload;
@@ -37,6 +38,13 @@ const registerUserInDb = async (payload: UserRegisterPayload) => {
 	const refreshToken = await generateToken(JwtPayload, {
 		expiresIn: env.JWT_REFRESH_EXPIRES_IN,
 		secret: env.JWT_REFRESH_SECRET,
+	});
+
+	makeNoise({
+		entityId: JwtPayload.id,
+		action: "USER_REGISTER",
+		entityType: "USER",
+		userId: JwtPayload.id,
 	});
 
 	return { accessToken, refreshToken };
@@ -72,6 +80,13 @@ const loginUser = async (payload: UserLoginPayload) => {
 	const refreshToken = await generateToken(JwtPayload, {
 		expiresIn: env.JWT_REFRESH_EXPIRES_IN,
 		secret: env.JWT_REFRESH_SECRET,
+	});
+
+	makeNoise({
+		entityId: JwtPayload.id,
+		action: "USER_LOGIN",
+		entityType: "USER",
+		userId: JwtPayload.id,
 	});
 
 	return { accessToken, refreshToken };

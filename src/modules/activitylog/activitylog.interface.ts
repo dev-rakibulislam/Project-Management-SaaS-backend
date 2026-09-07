@@ -5,10 +5,10 @@ import type {
 } from "../../../generated/enums";
 
 export interface CreateActivityLogParams {
-	organizationId: string;
-	userId: string;
-	action: ActivityAction | any;
-	entityType: ActivityEntityType | any;
-	entityId: string;
+	organizationId?: string;
+	userId?: string;
+	action?: ActivityAction ;
+	entityType?: ActivityEntityType ;
+	entityId?: string;
 	metadata?: Prisma.InputJsonValue;
 }

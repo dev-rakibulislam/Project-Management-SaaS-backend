@@ -107,6 +107,10 @@ enum ActivityAction {
   MEMBER_ADDED
   MEMBER_REMOVED
   MEMBER_ROLE_CHANGED
+
+  //user
+  USER_LOGIN
+  USER_REGISTER
 }
 
 enum ActivityEntityType {
@@ -115,6 +119,7 @@ enum ActivityEntityType {
   SPRINT
   COMMENT
   MEMBER
+  USER
   ORGANIZATION
   PLATFORM_NOISE
 }
