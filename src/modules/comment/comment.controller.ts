@@ -25,6 +25,28 @@ export const createCommentController = catchAsync(
 	},
 );
 
+const updateCommentController = catchAsync(
+	async (req: Request, res: Response) => {
+		const commentId = routeParam(req, "commentId");
+		const taskId = routeParam(req, "taskId");
+		const userId = req.user!.id;
+
+		const result = await commentService.updateCommentService(
+			commentId,
+			taskId,
+			userId,
+			req.body,
+		);
+
+		return sendResponse(res, {
+			code: 200,
+			message: "Comment updated successfully.",
+			data: result,
+		});
+	},
+);
+
 export const commentController = {
 	createCommentController,
+	updateCommentController,
 };

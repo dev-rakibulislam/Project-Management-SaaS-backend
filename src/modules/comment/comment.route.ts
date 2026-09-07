@@ -22,4 +22,16 @@ router.post(
 	),
 	commentController.createCommentController,
 );
+
+router.patch(
+	"/:slug/projects/:projectId/tasks/:taskId/comments/:commentId",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	validateData(createCommentValidation),
+	organizationAccessMiddleware(),
+	commentController.updateCommentController,
+);
+
+
+
 export const commentRouter = router;
