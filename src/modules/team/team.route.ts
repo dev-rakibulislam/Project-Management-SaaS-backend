@@ -33,7 +33,13 @@ router.get(
 	),
 	teamController.getAllTeamController,
 );
-
+router.get(
+  "/:slug/teams/:teamId",
+  authMiddleware(PlatformRole.USER),
+  subscriptionMiddleware,
+  organizationAccessMiddleware(),
+  teamController.getSingleTeamController,
+);
 // router.get("/:id", teamController.getTeam);
 // router.patch("/:id", teamController.updateTeam);
 // router.delete("/:id", teamController.deleteTeam);

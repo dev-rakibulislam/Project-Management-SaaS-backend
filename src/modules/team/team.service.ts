@@ -24,12 +24,7 @@ const getAllTeamService = async (organizationId: string) => {
 				organizationId,
 				deletedAt: null,
 			},
-			select: {
-				name: true,
-				description: true,
-				id: true,
-				organizationId: true,
-			},
+			omit: { deletedAt: true },
 		}),
 
 		prisma.team.count({
@@ -46,7 +41,37 @@ const getAllTeamService = async (organizationId: string) => {
 	};
 };
 
+const getSingleTeamService = async (organizationId: string, teamId: string) => {
+	const team = await prisma.team.findFirst({
+		where: {
+			id: teamId,
+			organizationId,
+			deletedAt: null,
+		},
+		omit: {
+			deletedAt: true,
+		},
+		include: {
+			projects: {
+				select: {
+					id: true,
+					name: true,
+					deletedAt: false,
+					description: true,
+				},
+			},
+		},
+	});
+
+	if (!team) {
+		throw new AppError(404, "Team not found.");
+	}
+
+	return team;
+};
+
 export const teamService = {
 	createTeamService,
 	getAllTeamService,
+	getSingleTeamService,
 };
