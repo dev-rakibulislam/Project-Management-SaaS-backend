@@ -42,8 +42,11 @@ const addMemberService = async (
 	return membership;
 };
 
-const getMemberships = async () => {
-	// TODO
+const getAllMembershipService = async (orgId: string) => {
+	const membership = await prisma.membership.findMany({
+		where: { organizationId: orgId, deleteAt: null },
+	});
+	return membership;
 };
 
 const getMembership = async () => {
@@ -60,7 +63,7 @@ const deleteMembership = async () => {
 
 export const membershipService = {
 	addMemberService,
-	getMemberships,
+	getAllMembershipService,
 	getMembership,
 	updateMembership,
 	deleteMembership,

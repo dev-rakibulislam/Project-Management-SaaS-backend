@@ -23,7 +23,7 @@ router.post(
 	membershipController.addMemberController,
 );
 
-// router.get("/", membershipController.getMemberships);
+router.get("/:slug/members", membershipController.getMemberController);
 
 // router.get("/:id", membershipController.getMembership);
 

@@ -107,6 +107,7 @@ const getMySingleOrganizationService = async (id: string) => {
 	const result = await prisma.organization.findUnique({
 		where: {
 			id,
+			deleteAt: null,
 		},
 		omit: {
 			deletedAt: true,
@@ -135,6 +136,7 @@ const getSingleOrganizationMemberService = async (
 			where: {
 				organizationId: orgId,
 				status: OrganizationStatus.ACTIVE,
+				deleteAt: null,
 			},
 			skip: pagination.skip,
 			take: pagination.limit,
