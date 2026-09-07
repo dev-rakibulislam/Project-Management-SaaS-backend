@@ -1,5 +1,6 @@
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/http";
+import { getQueryParams } from "../../utils/query";
 import { routeParam } from "../../utils/routeParam";
 import { membershipService } from "./membership.service";
 
@@ -20,15 +21,18 @@ const addMemberController = catchAsync(async (req, res) => {
 
 const getMemberController = catchAsync(async (req, res) => {
 	const organizationId = req.organizationMembership?.organizationId;
+	const query = getQueryParams(req.query);
 
-	const result = await membershipService.getAllMembershipService(
+	const { memberships, meta } = await membershipService.getAllMembershipService(
 		organizationId as string,
+		query,
 	);
 
 	return sendResponse(res, {
 		code: 200,
 		message: "Members fetched successfully",
-		data: result,
+		data: memberships,
+		metaData: meta,
 	});
 });
 

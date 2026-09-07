@@ -1,6 +1,8 @@
 import { MembershipStatus, OrganizationRole } from "../../../generated/enums";
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
+import { QueryParams } from "../../types/query";
+import { getPagination, getPaginationMeta } from "../../utils/pagination";
 import type {
 	createMembershipPayload,
 	updateMemberShipRolePayload,
@@ -45,12 +47,76 @@ const addMemberService = async (
 
 	return membership;
 };
+const getAllMembershipService = async (orgId: string, query: QueryParams) => {
+	const { page, limit } = query;
 
-const getAllMembershipService = async (orgId: string) => {
-	const membership = await prisma.membership.findMany({
-		where: { organizationId: orgId, deleteAt: null },
-	});
-	return membership;
+	const {
+		page: currentPage,
+		limit: currentLimit,
+		skip,
+	} = getPagination(page, limit);
+
+	const allowedSortFields = ["createdAt", "updatedAt", "role", "status"];
+
+	const sortBy = allowedSortFields.includes(query.sortBy || "")
+		? query.sortBy!
+		: "createdAt";
+
+	const where = {
+		organizationId: orgId,
+		deleteAt: null,
+
+		...(query.search && {
+			user: {
+				OR: [
+					{
+						name: {
+							contains: query.search,
+							mode: "insensitive" as const,
+						},
+					},
+					{
+						email: {
+							contains: query.search,
+							mode: "insensitive" as const,
+						},
+					},
+				],
+			},
+		}),
+	};
+
+	const [memberships, totalMemberships] = await prisma.$transaction([
+		prisma.membership.findMany({
+			where,
+
+			skip,
+			take: currentLimit,
+
+			orderBy: {
+				[sortBy]: query.sortOrder,
+			},
+
+			include: {
+				user: {
+					select: {
+						id: true,
+						name: true,
+						email: true,
+					},
+				},
+			},
+		}),
+
+		prisma.membership.count({
+			where,
+		}),
+	]);
+
+	return {
+		meta: getPaginationMeta(currentPage, currentLimit, totalMemberships),
+		memberships,
+	};
 };
 
 const getSingleMembershipService = async (

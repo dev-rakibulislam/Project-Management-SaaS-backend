@@ -1,5 +1,7 @@
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
+import { QueryParams } from "../../types/query";
+import { getPagination, getPaginationMeta } from "../../utils/pagination";
 import type {
 	CreateCommentInput,
 	updateCommentValidationPayload,
@@ -71,6 +73,7 @@ const updateCommentService = async (
 const getAllCommentsService = async (
 	taskId: string,
 	organizationId: string,
+	query: QueryParams,
 ) => {
 	const task = await prisma.task.findFirst({
 		where: {
@@ -84,35 +87,66 @@ const getAllCommentsService = async (
 		throw new AppError(404, "Task not found.");
 	}
 
-	const comments = await prisma.comment.findMany({
-		where: {
-			taskId,
-			deletedAt: null,
-		},
-		select: {
-			id: true,
-			content: true,
-			task: {
-				select: { title: true, description: true },
+	const { page, limit } = query;
+	const {
+		page: currentPage,
+		limit: currentLimit,
+		skip,
+	} = getPagination(page, limit);
+
+	const allowedSortFields = ["createdAt", "updatedAt", "content"];
+
+	const sortBy = allowedSortFields.includes(query.sortBy || "")
+		? query.sortBy!
+		: "createdAt";
+
+	const where = {
+		taskId,
+		deletedAt: null,
+
+		...(query.search && {
+			content: {
+				contains: query.search,
+				mode: "insensitive" as const,
 			},
-			taskId: true,
-			userId: true,
-			createdAt: true,
-			updatedAt: true,
-			user: {
-				select: {
-					id: true,
-					name: true,
-					email: true,
+		}),
+	};
+
+	const [comments, totalComments] = await prisma.$transaction([
+		prisma.comment.findMany({
+			where,
+			skip,
+			take: currentLimit,
+
+			orderBy: {
+				[sortBy]: query.sortOrder,
+			},
+			select: {
+				id: true,
+				content: true,
+				task: {
+					select: { title: true, description: true },
+				},
+				taskId: true,
+				userId: true,
+				createdAt: true,
+				updatedAt: true,
+				user: {
+					select: {
+						id: true,
+						name: true,
+						email: true,
+					},
 				},
 			},
-		},
-		orderBy: {
-			createdAt: "asc",
-		},
-	});
+		}),
+		prisma.comment.count({ where }),
+	]);
 
-	return comments;
+	return {
+		meta: getPaginationMeta(currentPage, currentLimit, totalComments),
+		comments,
+	};
 };
 
 const deleteCommentService = async (

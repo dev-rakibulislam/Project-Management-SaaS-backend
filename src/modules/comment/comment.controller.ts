@@ -3,6 +3,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/http";
 import { routeParam } from "../../utils/routeParam";
 import { commentService } from "./comment.service";
+import { getQueryParams } from "../../utils/query";
 
 export const createCommentController = catchAsync(
 	async (req: Request, res: Response) => {
@@ -49,18 +50,20 @@ const updateCommentController = catchAsync(
 const getAllCommentsController = catchAsync(
 	async (req: Request, res: Response) => {
 		const organizationId = req.organizationMembership!.organizationId;
-
+		const query = getQueryParams(req.query);
 		const taskId = routeParam(req, "taskId");
 
-		const result = await commentService.getAllCommentsService(
+		const { comments, meta } = await commentService.getAllCommentsService(
 			taskId,
 			organizationId,
+			query,
 		);
 
 		return sendResponse(res, {
 			code: 200,
 			message: "Comments fetched successfully.",
-			data: result,
+			data: comments,
+			metaData: meta,
 		});
 	},
 );

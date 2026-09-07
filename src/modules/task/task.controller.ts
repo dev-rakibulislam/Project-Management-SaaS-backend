@@ -31,7 +31,7 @@ const getTasksController = catchAsync(async (req: Request, res: Response) => {
 	const projectId = routeParam(req, "projectId");
 	const query = getQueryParams(req.query);
 
-	const { meta, task } = await taskService.getTasksService(
+	const { meta, tasks } = await taskService.getTasksService(
 		projectId,
 		organizationId,
 		query,
@@ -40,7 +40,7 @@ const getTasksController = catchAsync(async (req: Request, res: Response) => {
 	return sendResponse(res, {
 		code: 200,
 		message: "Tasks fetched successfully.",
-		data: task,
+		data: tasks,
 		metaData: meta,
 	});
 });

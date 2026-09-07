@@ -86,6 +86,7 @@ const getTasksService = async (
 	organizationId: string,
 	query: QueryParams,
 ) => {
+	
 	const { page, limit } = query;
 
 	const {
@@ -100,7 +101,24 @@ const getTasksService = async (
 		? query.sortBy!
 		: "createdAt";
 
+	// First verify project belongs to this organization
+	const project = await prisma.project.findFirst({
+		where: {
+			id: projectId,
+			organizationId,
+			deletedAt: null,
+		},
+		select: {
+			id: true,
+		},
+	});
+
+	if (!project) {
+		throw new AppError(404, "Project not found.");
+	}
+
 	const where = {
+		projectId,
 		organizationId,
 		deletedAt: null,
 
@@ -122,22 +140,13 @@ const getTasksService = async (
 		}),
 	};
 
-	const project = await prisma.project.findFirst({
-		where: {
-			id: projectId,
-			organizationId,
-		},
-	});
-
-	if (!project) {
-		throw new AppError(404, "Project not found.");
-	}
-
-	const [task, totalTask] = await prisma.$transaction([
+	const [tasks, totalTasks] = await prisma.$transaction([
 		prisma.task.findMany({
 			where,
+
 			skip,
 			take: currentLimit,
+
 			orderBy: {
 				[sortBy]: query.sortOrder,
 			},
@@ -148,14 +157,21 @@ const getTasksService = async (
 				description: true,
 				status: true,
 				priority: true,
+				dueDate: true,
+				assigneeId: true,
+				createdAt: true,
+				updatedAt: true,
 			},
 		}),
-		prisma.task.count({ where }),
+
+		prisma.task.count({
+			where,
+		}),
 	]);
 
 	return {
-		meta: getPaginationMeta(currentPage, currentLimit, totalTask),
-		task,
+		meta: getPaginationMeta(currentPage, currentLimit, totalTasks),
+		tasks,
 	};
 };
 

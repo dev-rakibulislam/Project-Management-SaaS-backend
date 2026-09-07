@@ -1,5 +1,7 @@
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
+import { getPagination, getPaginationMeta } from "../../utils/pagination";
+import { QueryParams } from "../../utils/query";
 import type {
 	assignProjectTeamValidationPayload,
 	createProjectValidationPayload,
@@ -123,39 +125,88 @@ const getProjectService = async (projectId: string, organizationId: string) => {
 	return project;
 };
 
-const getAllProjectService = async (organizationId: string) => {
-	const project = await prisma.project.findMany({
-		where: {
-			organizationId,
-			deletedAt: null,
-		},
-		select: {
-			id: true,
-			name: true,
-			description: true,
-			organizationId: true,
-			teamId: true,
-			status: true,
-			startDate: true,
-			endDate: true,
-			createdById: true,
-			createdAt: true,
-			updatedAt: true,
+const getAllProjectService = async (
+	organizationId: string,
+	query: QueryParams,
+) => {
+	const { page, limit } = query;
 
-			team: {
-				select: {
-					id: true,
-					name: true,
+	const {
+		page: currentPage,
+		limit: currentLimit,
+		skip,
+	} = getPagination(page, limit);
+
+	const allowedSortFields = ["createdAt", "updatedAt", "name"];
+
+	const sortBy = allowedSortFields.includes(query.sortBy || "")
+		? query.sortBy!
+		: "createdAt";
+
+	const where = {
+		organizationId,
+		deletedAt: null,
+
+		...(query.search && {
+			OR: [
+				{
+					name: {
+						contains: query.search,
+						mode: "insensitive" as const,
+					},
+				},
+				{
+					description: {
+						contains: query.search,
+						mode: "insensitive" as const,
+					},
+				},
+			],
+		}),
+	};
+
+	const [projects, totalProjects] = await prisma.$transaction([
+		prisma.project.findMany({
+			where,
+
+			skip,
+			take: currentLimit,
+
+			orderBy: {
+				[sortBy]: query.sortOrder,
+			},
+
+			select: {
+				id: true,
+				name: true,
+				description: true,
+				organizationId: true,
+				teamId: true,
+				status: true,
+				startDate: true,
+				endDate: true,
+				createdById: true,
+				createdAt: true,
+				updatedAt: true,
+
+				team: {
+					select: {
+						id: true,
+						name: true,
+					},
 				},
 			},
-		},
-	});
+		}),
 
-	if (!project) {
-		throw new AppError(404, "Project not found.");
-	}
+		prisma.project.count({
+			where,
+		}),
+	]);
 
-	return project;
+	return {
+		meta: getPaginationMeta(currentPage, currentLimit, totalProjects),
+		projects,
+	};
 };
 
 const updateProjectService = async (

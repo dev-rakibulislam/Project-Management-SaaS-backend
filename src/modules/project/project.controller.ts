@@ -3,6 +3,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import { projectService } from "./project.service";
 import { sendResponse } from "../../utils/http";
 import { routeParam } from "../../utils/routeParam";
+import { getQueryParams } from "../../utils/query";
 
 const createProjectController = catchAsync(
 	async (req: Request, res: Response) => {
@@ -64,16 +65,18 @@ const getProjectController = catchAsync(async (req: Request, res: Response) => {
 const getAllProjectController = catchAsync(
 	async (req: Request, res: Response) => {
 		const organizationId = req.organizationMembership!.organizationId;
+		const query = getQueryParams(req.query);
 
-
-		const result = await projectService.getAllProjectService(
+		const { meta, projects } = await projectService.getAllProjectService(
 			organizationId,
+			query,
 		);
 
 		return sendResponse(res, {
 			code: 200,
 			message: "Project fetched successfully.",
-			data: result,
+			data: projects,
+			metaData: meta,
 		});
 	},
 );
