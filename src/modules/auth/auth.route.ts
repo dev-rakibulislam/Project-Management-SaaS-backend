@@ -19,6 +19,11 @@ router.post(
 	authController.loginUserController,
 );
 
+router.post(
+	"/google-login",
+	authController.googleLogin,
+);
+
 router.get("/me", authMiddleware(), authController.getMyProfile);
 
 export const authRouter = router;

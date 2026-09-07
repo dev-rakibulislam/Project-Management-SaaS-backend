@@ -43,8 +43,21 @@ const getMyProfile = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const googleLogin = catchAsync(async (req: Request, res: Response) => {
+	const { credential } = req.body;
+
+	const result = await authService.googleLoginService(credential);
+
+	sendResponse(res, {
+		code: 200,
+		message: "Google login successful.",
+		data: result,
+	});
+});
+
 export const authController = {
 	registerUserController,
 	loginUserController,
 	getMyProfile,
+	googleLogin,
 };
