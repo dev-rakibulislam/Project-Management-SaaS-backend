@@ -75,10 +75,15 @@ export const changeTaskPriorityValidation = z.object({
 	priority: z.enum([TaskPriority.LOW, TaskPriority.MEDIUM, TaskPriority.HIGH]),
 });
 
+export const assignTaskValidation = z.object({
+	assigneeId: z.string().min(1, "Assignee ID is required"),
+});
+
 export type changeTaskPriorityPayload = z.infer<
 	typeof changeTaskPriorityValidation
 >;
 export type CreateTaskInput = z.infer<typeof createTaskValidation>;
+export type assignTaskValidationPayload = z.infer<typeof assignTaskValidation>;
 export type updateTaskPayload = z.infer<typeof updateTaskValidation>;
 export type changeTaskStatusPayload = z.infer<
 	typeof changeTaskStatusValidation

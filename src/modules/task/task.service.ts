@@ -2,6 +2,7 @@ import { MembershipStatus, OrganizationRole } from "../../../generated/enums";
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
 import type {
+	assignTaskValidationPayload,
 	changeTaskPriorityPayload,
 	changeTaskStatusPayload,
 	CreateTaskInput,
@@ -230,6 +231,53 @@ const changeTaskStatusService = async (
 	return updatedTask;
 };
 
+const assignTaskService = async (
+	taskId: string,
+	projectId: string,
+	organizationId: string,
+	assigneeId: assignTaskValidationPayload,
+) => {
+	const task = await prisma.task.findFirst({
+		where: {
+			id: taskId,
+			projectId,
+			organizationId,
+			deletedAt: null,
+		},
+	});
+
+	if (!task) {
+		throw new AppError(404, "Task not found.");
+	}
+
+	const membership = await prisma.membership.findFirst({
+		where: {
+			userId: assigneeId.assigneeId,
+			organizationId,
+			status: MembershipStatus.ACTIVE,
+			deleteAt: null,
+		},
+	});
+
+	if (!membership) {
+		throw new AppError(
+			404,
+			"Assignee is not an active member of this organization.",
+		);
+	}
+
+	const updatedTask = await prisma.task.update({
+		where: {
+			id: task.id,
+		},
+		data: {
+			assigneeId: assigneeId.assigneeId,
+		},
+	});
+
+	return updatedTask;
+};
+
 const changeTaskPriorityService = async (
 	taskId: string,
 	projectId: string,
@@ -248,13 +296,12 @@ const changeTaskPriorityService = async (
 	if (!task) {
 		throw new AppError(404, "Task not found.");
 	}
-	console.log(priority);
 	const updatedTask = await prisma.task.update({
 		where: {
 			id: task.id,
 		},
 		data: {
-			priority:priority.priority
+			priority: priority.priority,
 		},
 	});
 
@@ -296,6 +343,7 @@ export const taskService = {
 	getTasksService,
 	updateTaskService,
 	deleteTaskService,
+	assignTaskService,
 	changeTaskStatusService,
 	changeTaskPriorityService,
 };

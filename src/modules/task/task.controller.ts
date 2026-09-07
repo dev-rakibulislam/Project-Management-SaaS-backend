@@ -58,6 +58,26 @@ const updateTaskController = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const assignTaskController = catchAsync(async (req: Request, res: Response) => {
+	const organizationId = req.organizationMembership!.organizationId;
+
+	const projectId = routeParam(req, "projectId");
+	const taskId = routeParam(req, "taskId");
+
+	const result = await taskService.assignTaskService(
+		taskId,
+		projectId,
+		organizationId,
+		req.body,
+	);
+
+	return sendResponse(res, {
+		code: 200,
+		message: "Task assigned successfully.",
+		data: result,
+	});
+});
+
 const changeTaskStatusController = catchAsync(
 	async (req: Request, res: Response) => {
 		const organizationId = req.organizationMembership!.organizationId;
@@ -129,6 +149,7 @@ export const taskController = {
 	getTasksController,
 	updateTaskController,
 	deleteTaskController,
+	assignTaskController,
 	changeTaskStatusController,
 	changeTaskPriorityController,
 };

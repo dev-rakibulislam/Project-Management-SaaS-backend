@@ -6,6 +6,7 @@ import organizationAccessMiddleware from "../../middleware/organizationAccessMid
 import { OrganizationRole, PlatformRole } from "../../../generated/enums";
 import { validateData } from "../../middleware/validator.middleware";
 import {
+	assignTaskValidation,
 	changeTaskPriorityValidation,
 	changeTaskStatusValidation,
 	createTaskValidation,
@@ -45,6 +46,18 @@ router.patch(
 		OrganizationRole.ORG_ADMIN,
 	),
 	taskController.updateTaskController,
+);
+
+router.patch(
+	"/:slug/projects/:projectId/tasks/:taskId/assign",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	validateData(assignTaskValidation),
+	organizationAccessMiddleware(
+		OrganizationRole.OWNER,
+		OrganizationRole.ORG_ADMIN,
+	),
+	taskController.assignTaskController,
 );
 
 router.patch(
