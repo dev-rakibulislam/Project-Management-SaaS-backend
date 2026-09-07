@@ -39,6 +39,14 @@ router.patch(
 );
 
 router.get(
+	"/:slug/projects/",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	organizationAccessMiddleware(),
+	projectController.getAllProjectController,
+);
+
+router.get(
 	"/:slug/projects/:projectId",
 	authMiddleware(PlatformRole.USER),
 	subscriptionMiddleware,

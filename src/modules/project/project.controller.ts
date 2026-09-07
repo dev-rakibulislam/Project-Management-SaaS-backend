@@ -61,50 +61,66 @@ const getProjectController = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const getAllProjectController = catchAsync(
+	async (req: Request, res: Response) => {
+		const organizationId = req.organizationMembership!.organizationId;
+
+
+		const result = await projectService.getAllProjectService(
+			organizationId,
+		);
+
+		return sendResponse(res, {
+			code: 200,
+			message: "Project fetched successfully.",
+			data: result,
+		});
+	},
+);
+
 const updateProjectController = catchAsync(
-  async (req: Request, res: Response) => {
-    const organizationId =
-      req.organizationMembership!.organizationId;
+	async (req: Request, res: Response) => {
+		const organizationId = req.organizationMembership!.organizationId;
 
-    const projectId = routeParam(req, "projectId");
+		const projectId = routeParam(req, "projectId");
 
-    const result = await projectService.updateProjectService(
-      projectId,
-      organizationId,
-      req.body,
-    );
+		const result = await projectService.updateProjectService(
+			projectId,
+			organizationId,
+			req.body,
+		);
 
-    return sendResponse(res, {
-      code: 200,
-      message: "Project updated successfully.",
-      data: result,
-    });
-  },
+		return sendResponse(res, {
+			code: 200,
+			message: "Project updated successfully.",
+			data: result,
+		});
+	},
 );
 
 const deleteProjectController = catchAsync(
-  async (req: Request, res: Response) => {
-    const organizationId =
-      req.organizationMembership!.organizationId;
+	async (req: Request, res: Response) => {
+		const organizationId = req.organizationMembership!.organizationId;
 
-    const projectId = routeParam(req, "projectId");
+		const projectId = routeParam(req, "projectId");
 
-    const result = await projectService.deleteProjectService(
-      projectId,
-      organizationId,
-    );
+		const result = await projectService.deleteProjectService(
+			projectId,
+			organizationId,
+		);
 
-    return sendResponse(res, {
-      code: 200,
-      message: "Project deleted successfully.",
-      data: result,
-    });
-  },
+		return sendResponse(res, {
+			code: 200,
+			message: "Project deleted successfully.",
+			data: result,
+		});
+	},
 );
 
 export const projectController = {
 	createProjectController,
 	assignProjectTeamController,
+	getAllProjectController,
 	getProjectController,
 	updateProjectController,
 	deleteProjectController,

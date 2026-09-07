@@ -1,6 +1,10 @@
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
-import type { assignProjectTeamValidationPayload, createProjectValidationPayload, updateProjectValidationPayload } from "./project.validation";
+import type {
+	assignProjectTeamValidationPayload,
+	createProjectValidationPayload,
+	updateProjectValidationPayload,
+} from "./project.validation";
 
 const createProjectService = async (
 	organizationId: string,
@@ -83,43 +87,75 @@ const assignProjectTeamService = async (
 	return updatedProject;
 };
 
-const getProjectService = async (
-  projectId: string,
-  organizationId: string,
-) => {
-  const project = await prisma.project.findFirst({
-    where: {
-      id: projectId,
-      organizationId,
-      deletedAt: null,
-    },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      organizationId: true,
-      teamId: true,
-      status: true,
-      startDate: true,
-      endDate: true,
-      createdById: true,
-      createdAt: true,
-      updatedAt: true,
+const getProjectService = async (projectId: string, organizationId: string) => {
+	const project = await prisma.project.findFirst({
+		where: {
+			id: projectId,
+			organizationId,
+			deletedAt: null,
+		},
+		select: {
+			id: true,
+			name: true,
+			description: true,
+			organizationId: true,
+			teamId: true,
+			status: true,
+			startDate: true,
+			endDate: true,
+			createdById: true,
+			createdAt: true,
+			updatedAt: true,
 
-      team: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
-  });
+			team: {
+				select: {
+					id: true,
+					name: true,
+				},
+			},
+		},
+	});
 
-  if (!project) {
-    throw new AppError(404, "Project not found.");
-  }
+	if (!project) {
+		throw new AppError(404, "Project not found.");
+	}
 
-  return project;
+	return project;
+};
+
+const getAllProjectService = async (organizationId: string) => {
+	const project = await prisma.project.findMany({
+		where: {
+			organizationId,
+			deletedAt: null,
+		},
+		select: {
+			id: true,
+			name: true,
+			description: true,
+			organizationId: true,
+			teamId: true,
+			status: true,
+			startDate: true,
+			endDate: true,
+			createdById: true,
+			createdAt: true,
+			updatedAt: true,
+
+			team: {
+				select: {
+					id: true,
+					name: true,
+				},
+			},
+		},
+	});
+
+	if (!project) {
+		throw new AppError(404, "Project not found.");
+	}
+
+	return project;
 };
 
 const updateProjectService = async (
@@ -188,37 +224,38 @@ const updateProjectService = async (
 };
 
 const deleteProjectService = async (
-  projectId: string,
-  organizationId: string,
+	projectId: string,
+	organizationId: string,
 ) => {
-  const project = await prisma.project.findFirst({
-    where: {
-      id: projectId,
-      organizationId,
-      deletedAt: null,
-    },
-  });
+	const project = await prisma.project.findFirst({
+		where: {
+			id: projectId,
+			organizationId,
+			deletedAt: null,
+		},
+	});
 
-  if (!project) {
-    throw new AppError(404, "Project not found.");
-  }
+	if (!project) {
+		throw new AppError(404, "Project not found.");
+	}
 
-  await prisma.project.update({
-    where: {
-      id: project.id,
-    },
-    data: {
-      deletedAt: new Date(),
-    },
-  });
+	await prisma.project.update({
+		where: {
+			id: project.id,
+		},
+		data: {
+			deletedAt: new Date(),
+		},
+	});
 
-  return {};
+	return {};
 };
 
 export const projectService = {
 	createProjectService,
 	assignProjectTeamService,
 	getProjectService,
+	getAllProjectService,
 	updateProjectService,
 	deleteProjectService,
 };
