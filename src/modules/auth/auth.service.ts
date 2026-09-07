@@ -141,6 +141,7 @@ const googleLoginService = async (credential: string) => {
 				email: googleUser.email,
 				name: googleUser.name,
 				isActive: true,
+				googleId: googleUser.googleId,
 				platformRole: "USER",
 			},
 		});
