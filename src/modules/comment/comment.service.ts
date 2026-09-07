@@ -89,7 +89,7 @@ const deleteCommentService = async (
 		);
 	}
 
-	const deletedComment = await prisma.comment.update({
+	await prisma.comment.update({
 		where: {
 			id: comment.id,
 		},
@@ -98,7 +98,7 @@ const deleteCommentService = async (
 		},
 	});
 
-	return deletedComment;
+	return {};
 };
 
 export const commentService = {
