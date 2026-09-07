@@ -59,4 +59,16 @@ router.patch(
 	sprintController.updateSprintController,
 );
 
+router.delete(
+	"/:slug/projects/:projectId/sprints/:sprintId",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	organizationAccessMiddleware(
+		OrganizationRole.ORG_ADMIN,
+		OrganizationRole.OWNER,
+	),
+	sprintController.deleteSprintController,
+);
+
+
 export const sprintRouter = router;

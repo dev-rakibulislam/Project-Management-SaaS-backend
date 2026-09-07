@@ -81,9 +81,29 @@ const updateSprintController = catchAsync(
 	},
 );
 
+const deleteSprintController = catchAsync(
+	async (req: Request, res: Response) => {
+		const organizationId = req.organizationMembership!.organizationId;
+
+		const sprintId = routeParam(req, "sprintId");
+
+		const result = await sprintService.deleteSprintService(
+			sprintId,
+			organizationId,
+		);
+
+		return sendResponse(res, {
+			code: 200,
+			message: "Sprint deleted successfully.",
+			data: result,
+		});
+	},
+);
+
 export const sprintController = {
 	createSprintController,
 	getSprintsController,
 	getSprintController,
 	updateSprintController,
+	deleteSprintController,
 };

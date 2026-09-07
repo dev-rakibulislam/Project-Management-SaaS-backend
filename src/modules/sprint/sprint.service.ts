@@ -123,9 +123,36 @@ const updateSprintService = async (
 	return updatedSprint;
 };
 
+const deleteSprintService = async (
+	sprintId: string,
+	organizationId: string,
+) => {
+	const sprint = await prisma.sprint.findFirst({
+		where: {
+			id: sprintId,
+			project: {
+				organizationId,
+			},
+		},
+	});
+
+	if (!sprint) {
+		throw new AppError(404, "Sprint not found.");
+	}
+
+	 await prisma.sprint.delete({
+		where: {
+			id: sprint.id,
+		},
+	});
+
+	return {};
+};
+
 export const sprintService = {
 	createSprintService,
 	getSprintsService,
 	getSprintService,
 	updateSprintService,
+	deleteSprintService,
 };
