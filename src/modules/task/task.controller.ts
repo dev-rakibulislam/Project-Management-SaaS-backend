@@ -24,6 +24,26 @@ const createTaskController = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const getTasksController = catchAsync(
+	async (req: Request, res: Response) => {
+		const organizationId =
+			req.organizationMembership!.organizationId;
+
+		const projectId = routeParam(req, "projectId");
+
+		const result = await taskService.getTasksService(
+			projectId,
+			organizationId,
+		);
+
+		return sendResponse(res, {
+			code: 200,
+			message: "Tasks fetched successfully.",
+			data: result,
+		});
+	},
+);
+
 export const taskController = {
-	createTaskController,
+	createTaskController,getTasksController
 };

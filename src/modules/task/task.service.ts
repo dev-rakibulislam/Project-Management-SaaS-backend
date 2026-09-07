@@ -73,6 +73,32 @@ const createTaskService = async (
 	return task;
 };
 
+const getTasksService = async (projectId: string, organizationId: string) => {
+	const project = await prisma.project.findFirst({
+		where: {
+			id: projectId,
+			organizationId,
+		},
+	});
+
+	if (!project) {
+		throw new AppError(404, "Project not found.");
+	}
+
+	const tasks = await prisma.task.findMany({
+		where: {
+			projectId,
+			organizationId,
+		},
+		orderBy: {
+			createdAt: "desc",
+		},
+	});
+
+	return tasks;
+};
+
 export const taskService = {
 	createTaskService,
+	getTasksService,
 };

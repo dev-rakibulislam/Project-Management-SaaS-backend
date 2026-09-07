@@ -22,4 +22,12 @@ router.post(
 	taskController.createTaskController,
 );
 
+router.get(
+	"/:slug/projects/:projectId/tasks",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	organizationAccessMiddleware(),
+	taskController.getTasksController,
+);
+
 export const taskRouter = router;
