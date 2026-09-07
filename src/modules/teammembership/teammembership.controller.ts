@@ -12,7 +12,7 @@ const addTeamMemberController = catchAsync(
 		const result = await teammembershipService.addTeamMemberService(
 			teamId,
 			organizationId,
-			req.body
+			req.body,
 		);
 
 		return sendResponse(res, {
@@ -23,10 +23,50 @@ const addTeamMemberController = catchAsync(
 	},
 );
 
+const getAllTeamMembersController = catchAsync(
+	async (req: Request, res: Response) => {
+		const organizationId = req.organizationMembership!.organizationId;
+
+		const teamId = routeParam(req, "teamId");
+
+		const result = await teammembershipService.getAllTeamMembersService(
+			teamId,
+			organizationId,
+		);
+
+		return sendResponse(res, {
+			code: 200,
+			message: "Team members fetched successfully.",
+			data: result,
+		});
+	},
+);
+
+const getSingleTeamMemberController = catchAsync(
+	async (req: Request, res: Response) => {
+		const organizationId = req.organizationMembership!.organizationId;
+
+		const teamId = routeParam(req, "teamId");
+		const teamMemberId = routeParam(req, "teamMemberId");
+
+		const result = await teammembershipService.getSingleTeamMemberService(
+			teamId,
+			teamMemberId,
+			organizationId,
+		);
+
+		return sendResponse(res, {
+			code: 200,
+			message: "Team member fetched successfully.",
+			data: result,
+		});
+	},
+);
+
 export const teamMembershipController = {
 	addTeamMemberController,
-	// getTeammemberships,
-	// getTeammembership,
+	getAllTeamMembersController,
+	getSingleTeamMemberController,
 	// updateTeammembership,
 	// deleteTeammembership,
 };

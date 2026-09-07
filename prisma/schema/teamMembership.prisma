@@ -6,7 +6,7 @@ model TeamMembership {
 
   team Team @relation(fields: [teamId], references: [id])
 
-  membership Membership @relation(fields: [membershipId], references: [id])
+  membership Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 

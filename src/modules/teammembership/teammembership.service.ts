@@ -8,11 +8,16 @@ const addTeamMemberService = async (
 	organizationId: string,
 	membershipId: addTeamMemberValidationPayload,
 ) => {
+	console.log({
+		teamId,
+		organizationId,
+		membershipId: membershipId.membershipId,
+	});
+
 	const team = await prisma.team.findFirst({
 		where: {
 			id: teamId,
 			organizationId,
-			deletedAt: null,
 		},
 	});
 
@@ -32,9 +37,7 @@ const addTeamMemberService = async (
 	if (!membership) {
 		throw new AppError(404, "Membership not found in this organization.");
 	}
-
-	// Check already added
-	const existingTeamMembership = await prisma.teamMembership.findUnique({
+	const existingMember = await prisma.teamMembership.findUnique({
 		where: {
 			teamId_membershipId: {
 				teamId,
@@ -43,26 +46,92 @@ const addTeamMemberService = async (
 		},
 	});
 
-	if (existingTeamMembership) {
+	if (existingMember) {
 		throw new AppError(409, "Member is already in this team.");
 	}
 
-	const teamMembership = await prisma.teamMembership.create({
+	const teamMember = await prisma.teamMembership.create({
 		data: {
 			teamId,
 			membershipId: membershipId.membershipId,
 		},
 	});
 
-	return teamMembership;
+	return teamMember;
 };
 
-const getTeammemberships = async () => {
-	// TODO
+const getAllTeamMembersService = async (
+	teamId: string,
+	organizationId: string,
+) => {
+	const team = await prisma.team.findFirst({
+		where: {
+			id: teamId,
+			organizationId,
+		},
+	});
+
+	if (!team) {
+		throw new AppError(404, "Team not found.");
+	}
+
+	const teamMembers = await prisma.teamMembership.findMany({
+		where: {
+			teamId,
+		},
+		include: {
+			membership: {
+				select: {
+					id: true,
+					userId: true,
+					role: true,
+					status: true,
+				},
+			},
+		},
+	});
+
+	return teamMembers;
 };
 
-const getTeammembership = async () => {
-	// TODO
+const getSingleTeamMemberService = async (
+	teamId: string,
+	teamMemberId: string,
+	organizationId: string,
+) => {
+	const team = await prisma.team.findFirst({
+		where: {
+			id: teamId,
+			organizationId,
+		},
+	});
+
+	if (!team) {
+		throw new AppError(404, "Team not found.");
+	}
+
+	const teamMember = await prisma.teamMembership.findFirst({
+		where: {
+			id: teamMemberId,
+			teamId,
+		},
+		include: {
+			membership: {
+				select: {
+					id: true,
+					userId: true,
+					role: true,
+					status: true,
+				},
+			},
+		},
+	});
+
+	if (!teamMember) {
+		throw new AppError(404, "Team member not found.");
+	}
+
+	return teamMember;
 };
 
 const updateTeammembership = async () => {
@@ -75,8 +144,8 @@ const deleteTeammembership = async () => {
 
 export const teammembershipService = {
 	addTeamMemberService,
-	getTeammemberships,
-	getTeammembership,
+	getAllTeamMembersService,
+	getSingleTeamMemberService,
 	updateTeammembership,
 	deleteTeammembership,
 };
