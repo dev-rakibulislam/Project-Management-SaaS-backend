@@ -1,5 +1,7 @@
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
+import { getPagination, getPaginationMeta } from "../../utils/pagination";
+import { QueryParams } from "../../utils/query";
 import type { createTeamPayload, updateTeamPayload } from "./team.validation";
 
 const createTeamService = async (
@@ -17,26 +19,63 @@ const createTeamService = async (
 	return team;
 };
 
-const getAllTeamService = async (organizationId: string) => {
+const getAllTeamService = async (
+	organizationId: string,
+	query: QueryParams,
+) => {
+	const { page, limit } = query;
+
+	const {
+		page: currentPage,
+		limit: currentLimit,
+		skip,
+	} = getPagination(page, limit);
+
+	const allowedSortFields = ["createdAt", "updatedAt", "name"];
+
+	const sortBy = allowedSortFields.includes(query.sortBy || "")
+		? query.sortBy!
+		: "createdAt";
+
+	const where = {
+		organizationId,
+		deletedAt: null,
+
+		...(query.search && {
+			OR: [
+				{
+					name: {
+						contains: query.search,
+						mode: "insensitive" as const,
+					},
+				},
+			],
+		}),
+	};
+
 	const [teams, totalTeams] = await prisma.$transaction([
 		prisma.team.findMany({
-			where: {
-				organizationId,
-				deletedAt: null,
+			where,
+
+			skip,
+			take: currentLimit,
+
+			orderBy: {
+				[sortBy]: query.sortOrder,
 			},
-			omit: { deletedAt: true },
+
+			omit: {
+				deletedAt: true,
+			},
 		}),
 
 		prisma.team.count({
-			where: {
-				organizationId,
-				deletedAt: null,
-			},
+			where,
 		}),
 	]);
 
 	return {
-		totalTeams,
+		meta: getPaginationMeta(currentPage, currentLimit, totalTeams),
 		teams,
 	};
 };

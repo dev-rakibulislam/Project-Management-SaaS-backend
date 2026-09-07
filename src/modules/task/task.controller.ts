@@ -3,6 +3,7 @@ import { sendResponse } from "../../utils/http";
 import { routeParam } from "../../utils/routeParam";
 import { taskService } from "./task.service";
 import { catchAsync } from "../../utils/catchAsync";
+import { getQueryParams } from "../../utils/query";
 
 const createTaskController = catchAsync(async (req: Request, res: Response) => {
 	//
@@ -28,13 +29,19 @@ const getTasksController = catchAsync(async (req: Request, res: Response) => {
 	const organizationId = req.organizationMembership!.organizationId;
 
 	const projectId = routeParam(req, "projectId");
+	const query = getQueryParams(req.query);
 
-	const result = await taskService.getTasksService(projectId, organizationId);
+	const { meta, task } = await taskService.getTasksService(
+		projectId,
+		organizationId,
+		query,
+	);
 
 	return sendResponse(res, {
 		code: 200,
 		message: "Tasks fetched successfully.",
-		data: result,
+		data: task,
+		metaData: meta,
 	});
 });
 

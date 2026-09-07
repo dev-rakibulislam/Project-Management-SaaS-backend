@@ -1,6 +1,7 @@
 import AppError from "../../error/appError";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/http";
+import { getQueryParams } from "../../utils/query";
 import { routeParam } from "../../utils/routeParam";
 import { teamService } from "./team.service";
 
@@ -24,12 +25,17 @@ const getAllTeamController = catchAsync(async (req, res) => {
 	}
 
 	const organizationId = req.organizationMembership.organizationId;
+	const query = getQueryParams(req.query);
 
-	const result = await teamService.getAllTeamService(organizationId);
+	const { meta, teams } = await teamService.getAllTeamService(
+		organizationId,
+		query,
+	);
 	return sendResponse(res, {
 		code: 200,
 		message: "Teams fetched successfully",
-		data: result,
+		data: teams,
+		metaData:  meta,
 	});
 });
 

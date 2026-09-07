@@ -1,6 +1,8 @@
 import { MembershipStatus, OrganizationRole } from "../../../generated/enums";
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
+import { getPagination, getPaginationMeta } from "../../utils/pagination";
+import { QueryParams } from "../../utils/query";
 import type {
 	assignTaskValidationPayload,
 	changeTaskPriorityPayload,
@@ -79,7 +81,47 @@ const createTaskService = async (
 	return task;
 };
 
-const getTasksService = async (projectId: string, organizationId: string) => {
+const getTasksService = async (
+	projectId: string,
+	organizationId: string,
+	query: QueryParams,
+) => {
+	const { page, limit } = query;
+
+	const {
+		page: currentPage,
+		limit: currentLimit,
+		skip,
+	} = getPagination(page, limit);
+
+	const allowedSortFields = ["createdAt", "updatedAt", "title"];
+
+	const sortBy = allowedSortFields.includes(query.sortBy || "")
+		? query.sortBy!
+		: "createdAt";
+
+	const where = {
+		organizationId,
+		deletedAt: null,
+
+		...(query.search && {
+			OR: [
+				{
+					title: {
+						contains: query.search,
+						mode: "insensitive" as const,
+					},
+				},
+				{
+					description: {
+						contains: query.search,
+						mode: "insensitive" as const,
+					},
+				},
+			],
+		}),
+	};
+
 	const project = await prisma.project.findFirst({
 		where: {
 			id: projectId,
@@ -91,25 +133,30 @@ const getTasksService = async (projectId: string, organizationId: string) => {
 		throw new AppError(404, "Project not found.");
 	}
 
-	const tasks = await prisma.task.findMany({
-		where: {
-			projectId,
-			organizationId,
-			deletedAt: null,
-		},
-		orderBy: {
-			createdAt: "desc",
-		},
-		select: {
-			id: true,
-			title: true,
-			description: true,
-			status: true,
-			priority: true,
-		},
-	});
+	const [task, totalTask] = await prisma.$transaction([
+		prisma.task.findMany({
+			where,
+			skip,
+			take: currentLimit,
+			orderBy: {
+				[sortBy]: query.sortOrder,
+			},
 
-	return tasks;
+			select: {
+				id: true,
+				title: true,
+				description: true,
+				status: true,
+				priority: true,
+			},
+		}),
+		prisma.task.count({ where }),
+	]);
+
+	return {
+		meta: getPaginationMeta(currentPage, currentLimit, totalTask),
+		task,
+	};
 };
 
 const updateTaskService = async (
