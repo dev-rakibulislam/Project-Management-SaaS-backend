@@ -1,5 +1,6 @@
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
+import { makeNoise } from "../../utils/makeNoise";
 import { getPagination, getPaginationMeta } from "../../utils/pagination";
 import { QueryParams } from "../../utils/query";
 import type { createTeamPayload, updateTeamPayload } from "./team.validation";
@@ -14,6 +15,13 @@ const createTeamService = async (
 			description: data.description,
 			organizationId,
 		},
+	});
+
+	await makeNoise({
+		action: "TEAM_CREATE",
+		entityId: team.id,
+		entityType: "TEAM",
+		organizationId,
 	});
 
 	return team;
@@ -133,6 +141,23 @@ const updateTeamService = async (
 		data: payload,
 	});
 
+	await makeNoise({
+		action: "TEAM_UPDATE",
+		entityId: team.id,
+		entityType: "TEAM",
+		organizationId,
+		metadata: {
+			old: {
+				name: team.name,
+				description: team.description,
+			},
+			new: {
+				name: updatedTeam.name,
+				description: updatedTeam.description,
+			},
+		},
+	});
+
 	return updatedTeam;
 };
 
@@ -156,6 +181,13 @@ const deleteTeamService = async (organizationId: string, teamId: string) => {
 		data: {
 			deletedAt: new Date(),
 		},
+	});
+
+	await makeNoise({
+		action: "TEAM_DELETE",
+		entityId: team.id,
+		entityType: "TEAM",
+		organizationId,
 	});
 
 	return {};
