@@ -12,6 +12,7 @@ import {
 	paymentWithSslcommerz,
 } from "../../lib/sslComarcePayment";
 import type { AuthenticatedUser } from "../../types/auth";
+import { makeNoise } from "../../utils/makeNoise";
 import type { CreatePaymentPayload } from "./payment.validation";
 
 const createPaymentService = async (
@@ -107,6 +108,13 @@ const createPaymentService = async (
 		},
 	});
 
+	makeNoise({
+		entityId: organization.id,
+		action: "PAYMENT_INIT",
+		entityType: "PAYMENT",
+		organizationId: organization.id,
+	});
+
 	return {
 		message: `Payment initialized successfully. Amount: ${env.SSL_PRODUCT_AMOUNT}`,
 		transactionId: payment.transactionId,
@@ -149,8 +157,8 @@ const verifyPaymentService = async (tran_id: string, val_id: string) => {
 		currency_type,
 	} = data;
 
-	const transaction = await prisma.$transaction(async (tx) => {
-		await tx.payment.update({
+	const { pay, d } = await prisma.$transaction(async (tx) => {
+		const pay = await tx.payment.update({
 			where: {
 				id: payment.id,
 			},
@@ -175,11 +183,21 @@ const verifyPaymentService = async (tran_id: string, val_id: string) => {
 			},
 		});
 		return {
-			paymentStatus: PaymentStatus.SUCCESS,
-			SubscriptionStatus: SubscriptionStatus.ACTIVE,
+			pay,
+			d: {
+				paymentStatus: PaymentStatus.SUCCESS,
+				SubscriptionStatus: SubscriptionStatus.ACTIVE,
+			},
 		};
 	});
-	return transaction;
+
+	makeNoise({
+		entityId: pay.id,
+		action: "PAYMENT_VERIFY",
+		entityType: "PAYMENT",
+	});
+
+	return { ...d };
 };
 
 const failPaymentService = async (payload: any) => {
