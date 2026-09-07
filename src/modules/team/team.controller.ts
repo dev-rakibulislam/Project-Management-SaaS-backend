@@ -46,10 +46,40 @@ const getSingleTeamController = catchAsync(async (req, res) => {
 	});
 });
 
+const updateTeamController = catchAsync(async (req, res) => {
+	const organizationId = req.organizationMembership!.organizationId;
+	const teamId = routeParam(req, "teamId");
+
+	const result = await teamService.updateTeamService(
+		organizationId,
+		teamId,
+		req.body,
+	);
+
+	return sendResponse(res, {
+		code: 200,
+		message: "Team updated successfully",
+		data: result,
+	});
+});
+
+const deleteTeamController = catchAsync(async (req, res) => {
+	const organizationId = req.organizationMembership!.organizationId;
+	const teamId = routeParam(req, "teamId");
+
+	const result = await teamService.deleteTeamService(organizationId, teamId);
+
+	return sendResponse(res, {
+		code: 200,
+		message: "Team deleted successfully",
+		data: result,
+	});
+});
+
 export const teamController = {
 	createTeamController,
 	getAllTeamController,
 	getSingleTeamController,
-	// updateTeam,
-	// deleteTeam,
+	updateTeamController,
+	deleteTeamController,
 };

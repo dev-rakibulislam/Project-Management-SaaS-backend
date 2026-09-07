@@ -6,7 +6,10 @@ import authMiddleware from "../../middleware/authentication";
 import { OrganizationRole, PlatformRole } from "../../../generated/enums";
 import organizationAccessMiddleware from "../../middleware/organizationAccessMiddleware";
 import { validateData } from "../../middleware/validator.middleware";
-import { createTeamValidationSchema } from "./team.validation";
+import {
+	createTeamValidationSchema,
+	updateTeamSchema,
+} from "./team.validation";
 import subscriptionMiddleware from "../../middleware/subscriptionMiddleware";
 
 const router = Router();
@@ -34,14 +37,34 @@ router.get(
 	teamController.getAllTeamController,
 );
 router.get(
-  "/:slug/teams/:teamId",
-  authMiddleware(PlatformRole.USER),
-  subscriptionMiddleware,
-  organizationAccessMiddleware(),
-  teamController.getSingleTeamController,
+	"/:slug/teams/:teamId",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	organizationAccessMiddleware(),
+	teamController.getSingleTeamController,
 );
-// router.get("/:id", teamController.getTeam);
-// router.patch("/:id", teamController.updateTeam);
-// router.delete("/:id", teamController.deleteTeam);
+
+router.patch(
+	"/:slug/teams/:teamId",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	validateData(updateTeamSchema),
+	organizationAccessMiddleware(
+		OrganizationRole.ORG_ADMIN,
+		OrganizationRole.OWNER,
+	),
+	teamController.updateTeamController,
+);
+
+router.delete(
+	"/:slug/teams/:teamId",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	organizationAccessMiddleware(
+		OrganizationRole.ORG_ADMIN,
+		OrganizationRole.OWNER,
+	),
+	teamController.deleteTeamController,
+);
 
 export const teamRouter = router;
