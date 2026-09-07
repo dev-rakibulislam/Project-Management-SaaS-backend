@@ -46,4 +46,17 @@ router.get(
 	sprintController.getSprintController,
 );
 
+router.patch(
+	"/:slug/projects/:projectId/sprints/:sprintId",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	validateData(createSprintValidation),
+
+	organizationAccessMiddleware(
+		OrganizationRole.ORG_ADMIN,
+		OrganizationRole.OWNER,
+	),
+	sprintController.updateSprintController,
+);
+
 export const sprintRouter = router;

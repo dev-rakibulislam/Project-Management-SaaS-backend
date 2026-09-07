@@ -1,7 +1,10 @@
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
 import { makeNoise } from "../../utils/makeNoise";
-import type { CreateSprintInputPayload } from "./sprint.validation";
+import type {
+	CreateSprintInputPayload,
+	updateSprintValidationPayload,
+} from "./sprint.validation";
 
 const createSprintService = async (
 	organizationId: string,
@@ -92,8 +95,37 @@ const getSprintService = async (
 	return sprint;
 };
 
+const updateSprintService = async (
+	sprintId: string,
+	organizationId: string,
+	payload: updateSprintValidationPayload,
+) => {
+	const sprint = await prisma.sprint.findFirst({
+		where: {
+			id: sprintId,
+			project: {
+				organizationId,
+			},
+		},
+	});
+
+	if (!sprint) {
+		throw new AppError(404, "Sprint not found.");
+	}
+
+	const updatedSprint = await prisma.sprint.update({
+		where: {
+			id: sprint.id,
+		},
+		data: payload,
+	});
+
+	return updatedSprint;
+};
+
 export const sprintService = {
 	createSprintService,
 	getSprintsService,
 	getSprintService,
+	updateSprintService,
 };

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SprintStatus } from "../../../generated/enums";
 
 export const createSprintValidation = z
 	.object({
@@ -9,8 +10,14 @@ export const createSprintValidation = z
 
 		goal: z.string().max(1000, "Goal cannot exceed 1000 characters").optional(),
 
-		status: z.enum(["PLANNED", "ACTIVE", "COMPLETED", "CANCELLED"]).optional(),
-
+		status: z
+			.enum([
+				SprintStatus.CANCELLED,
+				SprintStatus.COMPLETED,
+				SprintStatus.PLANNED,
+				SprintStatus.ACTIVE,
+			])
+			.optional(),
 		startDate: z.coerce.date().optional(),
 
 		endDate: z.coerce.date().optional(),
@@ -24,4 +31,8 @@ export const createSprintValidation = z
 		},
 	);
 
+
 export type CreateSprintInputPayload = z.infer<typeof createSprintValidation>;
+export type updateSprintValidationPayload = z.infer<
+	typeof createSprintValidation
+>;

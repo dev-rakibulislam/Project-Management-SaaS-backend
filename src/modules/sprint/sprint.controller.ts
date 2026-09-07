@@ -13,7 +13,7 @@ const createSprintController = catchAsync(
 		const result = await sprintService.createSprintService(
 			organizationId,
 			userId,
-      projectId,
+			projectId,
 			req.body,
 		);
 
@@ -61,8 +61,29 @@ const getSprintController = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const updateSprintController = catchAsync(
+	async (req: Request, res: Response) => {
+		const organizationId = req.organizationMembership!.organizationId;
+
+		const sprintId = routeParam(req, "sprintId");
+
+		const result = await sprintService.updateSprintService(
+			sprintId,
+			organizationId,
+			req.body,
+		);
+
+		return sendResponse(res, {
+			code: 200,
+			message: "Sprint updated successfully.",
+			data: result,
+		});
+	},
+);
+
 export const sprintController = {
 	createSprintController,
 	getSprintsController,
 	getSprintController,
+	updateSprintController,
 };
