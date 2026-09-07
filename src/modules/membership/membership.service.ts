@@ -2,6 +2,7 @@ import { MembershipStatus, OrganizationRole } from "../../../generated/enums";
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
 import { QueryParams } from "../../types/query";
+import { makeNoise } from "../../utils/makeNoise";
 import { getPagination, getPaginationMeta } from "../../utils/pagination";
 import type {
 	createMembershipPayload,
@@ -43,6 +44,13 @@ const addMemberService = async (
 			role,
 			status: MembershipStatus.ACTIVE,
 		},
+	});
+
+	makeNoise({
+		entityId: membership.id,
+		action: "MEMBER_ADDED",
+		entityType: "MEMBER",
+		userId,
 	});
 
 	return membership;
@@ -177,6 +185,16 @@ const updateMembershipRoleService = async (
 		},
 	});
 
+	makeNoise({
+		entityId: updatedMembership.id,
+		action: "MEMBER_ADDED",
+		entityType: "MEMBER",
+		organizationId,
+		metadata: {
+			memberId: memberId,
+		},
+	});
+
 	return updatedMembership;
 };
 
@@ -210,6 +228,17 @@ const updateMemberStatusService = async (
 		},
 	});
 
+	makeNoise({
+		entityId: updatedMembership.id,
+		action: "MEMBER_STATUS_CHANGED",
+		entityType: "MEMBER",
+		organizationId,
+		metadata: {
+			oldStatus: membership.status,
+			NewStatus: updatedMembership.status,
+		},
+	});
+
 	return updatedMembership;
 };
 
@@ -236,6 +265,13 @@ const deleteMemberService = async (
 		data: {
 			deleteAt: new Date(),
 		},
+	});
+
+	makeNoise({
+		entityId: deletedMembership.id,
+		action: "MEMBER_REMOVED",
+		entityType: "MEMBER",
+		organizationId,
 	});
 
 	return deletedMembership;

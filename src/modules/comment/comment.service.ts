@@ -1,6 +1,7 @@
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
 import { QueryParams } from "../../types/query";
+import { makeNoise } from "../../utils/makeNoise";
 import { getPagination, getPaginationMeta } from "../../utils/pagination";
 import type {
 	CreateCommentInput,
@@ -31,6 +32,13 @@ const createCommentService = async (
 			taskId,
 			userId,
 		},
+	});
+
+	makeNoise({
+		entityId: comment.id,
+		action: "COMMENT_CREATED",
+		entityType: "COMMENT",
+		userId,
 	});
 
 	return comment;
@@ -65,6 +73,13 @@ const updateCommentService = async (
 		data: {
 			content: payload.content,
 		},
+	});
+
+	makeNoise({
+		entityId: updatedComment.id,
+		action: "COMMENT_UPDATED",
+		entityType: "COMMENT",
+		userId,
 	});
 
 	return updatedComment;
@@ -177,6 +192,13 @@ const deleteCommentService = async (
 		data: {
 			deletedAt: new Date(),
 		},
+	});
+
+	makeNoise({
+		entityId: comment.id,
+		action: "COMMENT_DELETED",
+		entityType: "COMMENT",
+		userId,
 	});
 
 	return {};
