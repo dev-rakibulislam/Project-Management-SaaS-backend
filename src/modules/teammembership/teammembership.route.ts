@@ -12,6 +12,7 @@ const router = Router();
 router.post(
 	"/:slug/teams/:teamId/member",
 	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
 	validateData(addTeamMemberValidationSchema),
 	organizationAccessMiddleware(
 		OrganizationRole.OWNER,
@@ -32,24 +33,22 @@ router.get(
 );
 
 router.get(
-  "/:slug/teams/:teamId/members/:teamMemberId",
-  authMiddleware(PlatformRole.USER),
-  subscriptionMiddleware,
-  organizationAccessMiddleware(),
-  teamMembershipController.getSingleTeamMemberController,
+	"/:slug/teams/:teamId/members/:teamMemberId",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	organizationAccessMiddleware(),
+	teamMembershipController.getSingleTeamMemberController,
 );
 
 router.delete(
-  "/:slug/teams/:teamId/members/:teamMemberId",
-  authMiddleware(PlatformRole.USER),
-  subscriptionMiddleware,
-  organizationAccessMiddleware(
-    OrganizationRole.ORG_ADMIN,
-    OrganizationRole.OWNER,
-  ),
-  teamMembershipController.deleteTeamMemberController,
+	"/:slug/teams/:teamId/members/:teamMemberId",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	organizationAccessMiddleware(
+		OrganizationRole.ORG_ADMIN,
+		OrganizationRole.OWNER,
+	),
+	teamMembershipController.deleteTeamMemberController,
 );
-
-
 
 export const teamMembershipRouter = router;

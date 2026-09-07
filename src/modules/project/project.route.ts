@@ -6,7 +6,11 @@ import subscriptionMiddleware from "../../middleware/subscriptionMiddleware";
 
 import { projectController } from "./project.controller";
 import { validateData } from "../../middleware/validator.middleware";
-import { assignProjectTeamValidation, createProjectValidationSchema } from "./project.validation";
+import {
+	assignProjectTeamValidation,
+	createProjectValidationSchema,
+	updateProjectValidationSchema,
+} from "./project.validation";
 
 const router = Router();
 
@@ -33,10 +37,37 @@ router.patch(
 	),
 	projectController.assignProjectTeamController,
 );
-// router.get("/", projectController.getProjects);
 
-// router.get("/:id", projectController.getProject);
+router.get(
+	"/:slug/projects/:projectId",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	organizationAccessMiddleware(),
+	projectController.getProjectController,
+);
 
-// router.delete("/:id", projectController.deleteProject);
+router.patch(
+  "/:slug/projects/:projectId",
+  authMiddleware(PlatformRole.USER),
+  subscriptionMiddleware,
+	validateData(updateProjectValidationSchema),
+  organizationAccessMiddleware(
+    OrganizationRole.ORG_ADMIN,
+    OrganizationRole.OWNER,
+  ),
+  projectController.updateProjectController,
+);
+
+router.delete(
+  "/:slug/projects/:projectId",
+  authMiddleware(PlatformRole.USER),
+  subscriptionMiddleware,
+  organizationAccessMiddleware(
+    OrganizationRole.ORG_ADMIN,
+    OrganizationRole.OWNER,
+  ),
+  projectController.deleteProjectController,
+);
+
 
 export const projectRouter = router;
