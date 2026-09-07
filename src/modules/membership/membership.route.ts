@@ -10,6 +10,7 @@ import { validateData } from "../../middleware/validator.middleware";
 import {
 	createMembershipSchema,
 	updateMemberShipRoleSchema,
+	updateMemberShipStatusSchema,
 } from "./membership.validation";
 
 const router = Router();
@@ -60,6 +61,27 @@ router.patch(
 	membershipController.updateMemberRoleController,
 );
 
-// router.delete("/:id", membershipController.deleteMembership);
+router.patch(
+	"/:slug/members/:memberId/status",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	validateData(updateMemberShipStatusSchema),
+	organizationAccessMiddleware(
+		OrganizationRole.ORG_ADMIN,
+		OrganizationRole.OWNER,
+	),
+	membershipController.updateMemberStatusController,
+);
+
+router.delete(
+	"/:slug/members/:memberId",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	organizationAccessMiddleware(
+		OrganizationRole.ORG_ADMIN,
+		OrganizationRole.OWNER,
+	),
+	membershipController.deleteMemberController,
+);
 
 export const membershipRouter = router;

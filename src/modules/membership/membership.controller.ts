@@ -63,9 +63,43 @@ const updateMemberRoleController = catchAsync(async (req, res) => {
 	});
 });
 
+const updateMemberStatusController = catchAsync(async (req, res) => {
+	const organizationId = req.organizationMembership!.organizationId;
+	const memberId = routeParam(req, "memberId");
+
+	const result = await membershipService.updateMemberStatusService(
+		organizationId,
+		memberId,
+		req.body,
+	);
+
+	return sendResponse(res, {
+		code: 200,
+		message: "Member status updated successfully",
+		data: result,
+	});
+});
+
+const deleteMemberController = catchAsync(async (req, res) => {
+	const organizationId = req.organizationMembership!.organizationId;
+	const memberId = routeParam(req, "memberId");
+
+	const result = await membershipService.deleteMemberService(
+		organizationId,
+		memberId,
+	);
+
+	return sendResponse(res, {
+		code: 200,
+		message: "Member deleted successfully",
+		data: result,
+	});
+});
 export const membershipController = {
 	addMemberController,
 	getMemberController,
 	getSingleMemberController,
 	updateMemberRoleController,
+	updateMemberStatusController,
+	deleteMemberController,
 };

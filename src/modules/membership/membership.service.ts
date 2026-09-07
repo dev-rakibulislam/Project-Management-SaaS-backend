@@ -1,9 +1,10 @@
-import { MembershipStatus } from "../../../generated/enums";
+import { MembershipStatus, OrganizationRole } from "../../../generated/enums";
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
 import type {
 	createMembershipPayload,
 	updateMemberShipRolePayload,
+	updateMemberShipStatusPayload,
 } from "./membership.validation";
 
 const addMemberService = async (
@@ -97,6 +98,10 @@ const updateMembershipRoleService = async (
 		throw new AppError(404, "Member not found.");
 	}
 
+	if (membership.role === OrganizationRole.OWNER) {
+		throw new AppError(403, "Owner role cannot be changed.");
+	}
+
 	const updatedMembership = await prisma.membership.update({
 		where: {
 			id: membership.id,
@@ -109,8 +114,65 @@ const updateMembershipRoleService = async (
 	return updatedMembership;
 };
 
-const deleteMembership = async () => {
-	// TODO
+const updateMemberStatusService = async (
+	organizationId: string,
+	memberId: string,
+	status: updateMemberShipStatusPayload,
+) => {
+	const membership = await prisma.membership.findFirst({
+		where: {
+			id: memberId,
+			organizationId,
+			deleteAt: null,
+		},
+	});
+
+	if (!membership) {
+		throw new AppError(404, "Member not found.");
+	}
+
+	if (membership.role === OrganizationRole.OWNER) {
+		throw new AppError(403, "Owner status cannot be changed.");
+	}
+
+	const updatedMembership = await prisma.membership.update({
+		where: {
+			id: membership.id,
+		},
+		data: {
+			status: status.status,
+		},
+	});
+
+	return updatedMembership;
+};
+
+const deleteMemberService = async (
+	organizationId: string,
+	memberId: string,
+) => {
+	const membership = await prisma.membership.findFirst({
+		where: {
+			id: memberId,
+			organizationId,
+			deleteAt: null,
+		},
+	});
+
+	if (!membership) {
+		throw new AppError(404, "Member not found.");
+	}
+
+	const deletedMembership = await prisma.membership.update({
+		where: {
+			id: membership.id,
+		},
+		data: {
+			deleteAt: new Date(),
+		},
+	});
+
+	return deletedMembership;
 };
 
 export const membershipService = {
@@ -118,5 +180,6 @@ export const membershipService = {
 	getAllMembershipService,
 	getSingleMembershipService,
 	updateMembershipRoleService,
-	deleteMembership,
+	updateMemberStatusService,
+	deleteMemberService,
 };

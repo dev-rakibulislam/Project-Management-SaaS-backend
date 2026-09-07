@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { OrganizationRole } from "../../../generated/enums";
+import { MembershipStatus, OrganizationRole } from "../../../generated/enums";
 
 export const createMembershipSchema = z.object({
 	userId: z.string({
@@ -13,7 +13,13 @@ export const updateMemberShipRoleSchema = z.object({
 	role: z.enum([OrganizationRole.MEMBER, OrganizationRole.ORG_ADMIN]),
 });
 
+export const updateMemberShipStatusSchema = z.object({
+	status: z.enum([MembershipStatus.ACTIVE, MembershipStatus.BLOCK]),
+});
+
 export type createMembershipPayload = z.infer<typeof createMembershipSchema>;
 export type updateMemberShipRolePayload = z.infer<
-	typeof updateMemberShipRoleSchema
+typeof updateMemberShipRoleSchema
 >;
+
+export type updateMemberShipStatusPayload = z.infer<typeof updateMemberShipStatusSchema>;
