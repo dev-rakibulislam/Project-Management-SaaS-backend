@@ -19,6 +19,7 @@ export const app: Application = express();
 import cors from "cors";
 import { apiLimiter } from "./middleware/limiter";
 import AppError from "./error/appError";
+import { superAdminRouter } from "./modules/superadmin/superadmin.route";
 
 app.use(cors());
 // app.use(cors({ credentials: true }));
@@ -42,6 +43,8 @@ app.use("/api/v1/sprint", sprintRouter);
 app.use("/api/v1/task", taskRouter);
 app.use("/api/v1/comment", commentRouter);
 app.use("/api/v1/attachment", attachmentRouter);
+app.use("/api/v1/sudo", superAdminRouter);
+
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {
