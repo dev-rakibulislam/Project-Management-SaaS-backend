@@ -2,6 +2,7 @@ import type { UploadApiResponse } from "cloudinary";
 import AppError from "../../error/appError";
 import cloudinary from "../../lib/cloudinary";
 import { prisma } from "../../lib/prisma";
+import { makeNoise } from "../../utils/makeNoise";
 
 const createAttachmentService = async (
 	organizationId: string,
@@ -60,14 +61,19 @@ const createAttachmentService = async (
 		},
 	});
 
+	makeNoise({
+		entityId: attachment.id,
+		action: "ADD_attachment",
+		entityType: "attachment",
+		organizationId:organizationId,
+		userId,
+	});
+
 	return attachment;
 };
 
-const deleteAttachment = async () => {
-	// TODO
-};
 
 export const attachmentService = {
 	createAttachmentService,
-	deleteAttachment,
+	
 };
