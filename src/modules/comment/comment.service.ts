@@ -68,6 +68,53 @@ const updateCommentService = async (
 	return updatedComment;
 };
 
+const getAllCommentsService = async (
+	taskId: string,
+	organizationId: string,
+) => {
+	const task = await prisma.task.findFirst({
+		where: {
+			id: taskId,
+			organizationId,
+			deletedAt: null,
+		},
+	});
+
+	if (!task) {
+		throw new AppError(404, "Task not found.");
+	}
+
+	const comments = await prisma.comment.findMany({
+		where: {
+			taskId,
+			deletedAt: null,
+		},
+		select: {
+			id: true,
+			content: true,
+			task: {
+				select: { title: true, description: true },
+			},
+			taskId: true,
+			userId: true,
+			createdAt: true,
+			updatedAt: true,
+			user: {
+				select: {
+					id: true,
+					name: true,
+					email: true,
+				},
+			},
+		},
+		orderBy: {
+			createdAt: "asc",
+		},
+	});
+
+	return comments;
+};
+
 const deleteCommentService = async (
 	commentId: string,
 	taskId: string,
@@ -105,4 +152,5 @@ export const commentService = {
 	createCommentService,
 	updateCommentService,
 	deleteCommentService,
+	getAllCommentsService,
 };

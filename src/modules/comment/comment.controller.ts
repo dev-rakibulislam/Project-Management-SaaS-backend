@@ -46,6 +46,25 @@ const updateCommentController = catchAsync(
 	},
 );
 
+const getAllCommentsController = catchAsync(
+	async (req: Request, res: Response) => {
+		const organizationId = req.organizationMembership!.organizationId;
+
+		const taskId = routeParam(req, "taskId");
+
+		const result = await commentService.getAllCommentsService(
+			taskId,
+			organizationId,
+		);
+
+		return sendResponse(res, {
+			code: 200,
+			message: "Comments fetched successfully.",
+			data: result,
+		});
+	},
+);
+
 const deleteCommentController = catchAsync(
 	async (req: Request, res: Response) => {
 		const commentId = routeParam(req, "commentId");
@@ -70,4 +89,5 @@ export const commentController = {
 	createCommentController,
 	updateCommentController,
 	deleteCommentController,
+	getAllCommentsController,
 };

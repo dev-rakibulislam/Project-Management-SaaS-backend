@@ -32,6 +32,14 @@ router.patch(
 	commentController.updateCommentController,
 );
 
+router.get(
+	"/:slug/projects/:projectId/tasks/:taskId/comments",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	organizationAccessMiddleware(),
+	commentController.getAllCommentsController,
+);
+
 router.delete(
 	"/:slug/projects/:projectId/tasks/:taskId/comments/:commentId",
 	authMiddleware(PlatformRole.USER),
