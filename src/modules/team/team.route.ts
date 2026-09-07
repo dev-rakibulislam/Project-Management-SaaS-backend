@@ -7,21 +7,33 @@ import { OrganizationRole, PlatformRole } from "../../../generated/enums";
 import organizationAccessMiddleware from "../../middleware/organizationAccessMiddleware";
 import { validateData } from "../../middleware/validator.middleware";
 import { createTeamValidationSchema } from "./team.validation";
+import subscriptionMiddleware from "../../middleware/subscriptionMiddleware";
 
 const router = Router();
 
 router.post(
 	"/:slug/teams",
 	authMiddleware(PlatformRole.USER),
+	validateData(createTeamValidationSchema),
+	subscriptionMiddleware,
 	organizationAccessMiddleware(
 		OrganizationRole.OWNER,
 		OrganizationRole.ORG_ADMIN,
 	),
-	validateData(createTeamValidationSchema),
 	teamController.createTeamController,
 );
 
-// router.get("/", teamController.getTeams);
+router.get(
+	"/:slug/teams",
+	authMiddleware(PlatformRole.USER),
+	subscriptionMiddleware,
+	organizationAccessMiddleware(
+		OrganizationRole.OWNER,
+		OrganizationRole.ORG_ADMIN,
+	),
+	teamController.getAllTeamController,
+);
+
 // router.get("/:id", teamController.getTeam);
 // router.patch("/:id", teamController.updateTeam);
 // router.delete("/:id", teamController.deleteTeam);
