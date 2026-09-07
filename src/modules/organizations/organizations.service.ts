@@ -6,6 +6,7 @@ import {
 import AppError from "../../error/appError";
 import { prisma } from "../../lib/prisma";
 import type { AuthenticatedUser } from "../../types/auth";
+import { makeNoise } from "../../utils/makeNoise";
 import { getPagination, getPaginationMeta } from "../../utils/pagination";
 import type {
 	createOrganizationPayload,
@@ -57,7 +58,7 @@ const createOrganizationService = async (
 		finalUniqueSlug = uniqueSlug;
 	}
 
-	const transaction = await prisma.$transaction(async (tx) => {
+	const { organization, result } = await prisma.$transaction(async (tx) => {
 		const organization = await tx.organization.create({
 			data: {
 				name,
@@ -74,10 +75,17 @@ const createOrganizationService = async (
 			},
 			include: { organization: { omit: { deletedAt: true } } },
 		});
-		return result;
+		return { result, organization };
 	});
 
-	return transaction;
+	makeNoise({
+		entityId: organization.id,
+		action: "ORGANIZATION_CREATED",
+		entityType: "ORGANIZATION",
+		organizationId: organization.id,
+	});
+
+	return result;
 };
 
 const getMyOrganizationService = async (user: AuthenticatedUser) => {
@@ -183,6 +191,14 @@ const updateOrganizationService = async (
 		where: { id: orgId },
 		data,
 	});
+
+	makeNoise({
+		entityId: result.id,
+		action: "ORGANIZATION_UPDATED",
+		entityType: "ORGANIZATION",
+		organizationId: result.id,
+	});
+
 	return result;
 };
 
